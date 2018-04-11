@@ -2,6 +2,7 @@
 Imports Autodesk.AutoCAD.ApplicationServices
 Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
 Imports System.Collections.ObjectModel
+Imports AutoCADElectrical.com.vasilchenko.TerminalEnums
 
 Namespace com.vasilchenko.DBAccessConnection
     Module DBDataAccessObject
@@ -110,7 +111,7 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objResultTerminal
         End Function
-        Public Function FillTerminalBlockPath(objInputTerminal As TerminalClass) As TerminalClass
+        Public Sub FillTerminalBlockPath(ByRef objInputTerminal As TerminalClass)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
 
@@ -121,13 +122,11 @@ Namespace com.vasilchenko.DBAccessConnection
             objDataTable = GetOleBdDataReader(strSQLQuery, strConstFootprintPath)
 
             If Not IsNothing(objDataTable) Then objInputTerminal.BLOCK = objDataTable.Rows(0).Item("BLKNAM")
-
-            Return objInputTerminal
-        End Function
-        Public Function FillTerminalConnectionsData(objInputTerminal As TerminalClass) As TerminalClass
+        End Sub
+        Public Sub FillTerminalConnectionsData(ByRef objInputTerminal As TerminalClass, eDucktSide As DuctSideEnum)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
-            Dim objWiresDic As New Dictionary(Of String, ArrayList)
+            Dim objWiresDictionary As New TerminalDictionaryClass(Of String, ArrayList)
 
             strSQLQuery = "SELECT [WIRENO], [INST1], [LOC1],[NAM1], [PIN1], [INST2], [LOC2],[NAM2], [PIN2], [CBL] " &
                     "FROM WFRM2ALL " &
@@ -167,25 +166,74 @@ Namespace com.vasilchenko.DBAccessConnection
                             objWire.Cable = objCable
                         Else objWire.Cable = Nothing
                         End If
-                        If objWiresDic.ContainsKey(strWireno) Then
-                            objWiresDic(strWireno).Add(objWire)
+                        If objWiresDictionary.ContainsKey(strWireno) Then
+                            objWiresDictionary.Item(strWireno).Add(objWire)
                         Else
                             objWiresList.Add(objWire)
-                            objWiresDic.Add(key:=strWireno, value:=objWiresList)
+                            objWiresDictionary.Add(key:=strWireno, value:=objWiresList)
                         End If
                     End With
                 Next objRow
-            Else
-                MsgBox("Данные не обнаружены", vbCritical, "ERROR")
-                Throw New ArgumentNullException
             End If
 
-            IdentityTags(objWiresDic)
-            'SortCollectionByInstAndCables objWiresDictionary
-            'SortDictionaryByInstAndCables objWiresDictionary, objInputTerminal.LOC
+            If objWiresDictionary.Count = 0 Then
+                Exit Sub
+            End If
 
-            Return objInputTerminal
-        End Function
+            IdentityTags(objWiresDictionary)
+            SortCollectionByInstAndCables(objWiresDictionary)
+            SortDictionaryByInstAndCables(objWiresDictionary, objInputTerminal.LOC)
+
+            If objWiresDictionary.Count > 2 Then
+                Throw New ArgumentOutOfRangeException
+            ElseIf objWiresDictionary.Count = 1 Then
+                Dim objTempList As ArrayList = objWiresDictionary.Item(0)
+                Dim intCableNum As Integer = CableInList(objTempList)
+                If eDucktSide.Equals(DuctSideEnum.Rigth) Then
+                    For intA As Integer = 0 To objTempList.Count - 1
+                        If intA <> intCableNum And objInputTerminal.WiresRigthList.Count < 2 Then
+                            objInputTerminal.WireRigth = objTempList.Item(intA)
+                        ElseIf objInputTerminal.WiresLeftList.Count < 2 Then
+                            objInputTerminal.WireLeft = objTempList.Item(intA)
+                        Else
+                            MsgBox("Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM, vbCritical, "Error")
+                        End If
+                    Next
+                Else
+                    For intA As Integer = 0 To objTempList.Count - 1
+                        If intA <> intCableNum And objInputTerminal.WiresLeftList.Count < 2 Then
+                            objInputTerminal.WireLeft = objTempList.Item(intA)
+                        ElseIf objInputTerminal.WiresRigthList.Count < 2 Then
+                            objInputTerminal.WireRigth = objTempList.Item(intA)
+                        Else
+                            MsgBox("Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM, vbCritical, "Error")
+                        End If
+                    Next
+                End If
+            ElseIf objWiresDictionary.Count = 2 Then
+                Dim intCableNum = CableInDictionary(objWiresDictionary, objInputTerminal.LOC)
+                For intI As Integer = 0 To objWiresDictionary.Count - 1
+                    Dim objTempList = objWiresDictionary.Item(intI)
+                    If eDucktSide.Equals(DuctSideEnum.Rigth) And intI <> intCableNum Then
+                        For lngA As Integer = 0 To objTempList.Count - 1
+                            If objInputTerminal.WiresRigthList.Count < 2 Then
+                                objInputTerminal.WireRigth = objTempList.Item(lngA)
+                            Else
+                                MsgBox("Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM, vbCritical, "Error")
+                            End If
+                        Next
+                    Else
+                        For intA As Integer = 0 To objTempList.Count - 1
+                            If objInputTerminal.WiresLeftList.Count < 2 Then
+                                objInputTerminal.WireLeft = objTempList.Item(intA)
+                            Else
+                                MsgBox("Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM, vbCritical, "Error")
+                            End If
+                        Next
+                    End If
+                Next
+            End If
+        End Sub
 
     End Module
 End Namespace

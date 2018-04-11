@@ -8,22 +8,22 @@ Namespace com.vasilchenko.TerminalModules
         Public Sub CreateTerminalBlock(strLocation As String, strTagstrip As String,
                                     eOrientation As TerminalOrientationEnum, eDucktSide As DuctSideEnum)
             Dim objTermsArray As ArrayList
-            Dim objMappingTermsCollection As New Collection
+            Dim objMappingTermsCollection As ArrayList
 
             objTermsArray = GetAllTermsInLocation(strLocation, strTagstrip)
-            FillTerminalData(objTermsArray, strTagstrip)
+            objMappingTermsCollection = FillTerminalData(objTermsArray, strTagstrip, eDucktSide)
 
         End Sub
 
-        Private Function FillTerminalData(objInputList As ArrayList, strTagstrip As String) As ArrayList
+        Private Function FillTerminalData(objInputList As ArrayList, strTagstrip As String, eDucktSide As DuctSideEnum) As ArrayList
             Dim objResultArray As New ArrayList
 
             For Each strTempItem As String In objInputList
                 objResultArray.Add(FillTermTypeData(strTagstrip, strTempItem))
             Next
             For Each objTempItem As TerminalClass In objResultArray
-                objResultArray.Add(FillTerminalBlockPath(objTempItem))
-                objResultArray.Add(FillTerminalConnectionsData(objTempItem))
+                FillTerminalBlockPath(objTempItem)
+                FillTerminalConnectionsData(objTempItem, eDucktSide)
             Next
 
             Return objResultArray

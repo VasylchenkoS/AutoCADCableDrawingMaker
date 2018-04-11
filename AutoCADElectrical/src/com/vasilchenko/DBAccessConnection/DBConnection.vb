@@ -18,7 +18,6 @@ Namespace com.vasilchenko.DBAccessConnection
                 Catch ex As Exception
                     MsgBox(ex.Message)
                     Throw New ArgumentNullException
-                    'Return Nothing
                 End Try
             End Using
 

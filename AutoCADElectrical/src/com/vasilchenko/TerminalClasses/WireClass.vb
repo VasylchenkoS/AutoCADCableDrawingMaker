@@ -60,7 +60,7 @@
         End Property
 
         Public Function HasCable() As Boolean
-            HasCable = IsNothing(Me.objCABLE)
+            HasCable = Not IsNothing(Me.objCABLE)
         End Function
         Protected Overrides Sub Finalize()
             Me.objCABLE = Nothing

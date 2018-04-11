@@ -112,7 +112,8 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresSortFunctions.vb" />
+    <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalWiresDictionaryClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\GetEnumFromDescriptionAttribute.vb" />
     <Compile Include="src\com\vasilchenko\TerminalForms\ufTerminalSelector.Designer.vb">
       <DependentUpon>ufTerminalSelector.vb</DependentUpon>
