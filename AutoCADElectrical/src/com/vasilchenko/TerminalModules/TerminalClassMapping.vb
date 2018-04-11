@@ -13,6 +13,17 @@ Namespace com.vasilchenko.TerminalModules
             objTermsArray = GetAllTermsInLocation(strLocation, strTagstrip)
             objMappingTermsCollection = FillTerminalData(objTermsArray, strTagstrip, eDucktSide)
 
+            Dim ufTTS As New ufTerminalTypeSelector
+            With ufTTS
+                ufTTS.ShowDialog()
+                If .rbtnSignalisation.Checked Then
+                    'AddPhoenixAccForSignalisation objMappingTermsCollection, eDucktSide
+                ElseIf .rbtnMeasurement.Checked Then
+                ElseIf .rbtnControl.Checked Then
+                ElseIf .rbtnPower.Checked Then
+                End If
+            End With
+
         End Sub
 
         Private Function FillTerminalData(objInputList As ArrayList, strTagstrip As String, eDucktSide As DuctSideEnum) As ArrayList
