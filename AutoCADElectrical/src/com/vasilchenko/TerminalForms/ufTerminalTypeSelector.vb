@@ -8,6 +8,7 @@
         Me.rbtnMeasurement.Checked = False
         Me.rbtnControl.Checked = False
         Me.rbtnPower.Checked = False
+        Me.Dispose()
     End Sub
 
     Private Sub rbtnControl_CheckedChanged(sender As Object, e As EventArgs) Handles rbtnControl.CheckedChanged

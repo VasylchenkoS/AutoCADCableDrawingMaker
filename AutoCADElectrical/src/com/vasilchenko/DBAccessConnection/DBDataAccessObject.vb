@@ -1,13 +1,11 @@
-﻿Imports System.Data.OleDb
-Imports Autodesk.AutoCAD.ApplicationServices
+﻿Imports Autodesk.AutoCAD.ApplicationServices
 Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
-Imports System.Collections.ObjectModel
 Imports AutoCADElectrical.com.vasilchenko.TerminalEnums
 
 Namespace com.vasilchenko.DBAccessConnection
     Module DBDataAccessObject
-        Private Const strConstFootprintPath As String = "C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
-        Private Const strConstDefaultCatPath As String = "C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
+        Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
+        Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
         Private strConstProjectDatabasePath As String
 
         Public Function GetAllLocations() As ArrayList

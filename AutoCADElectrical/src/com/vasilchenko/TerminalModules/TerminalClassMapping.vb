@@ -2,6 +2,8 @@
 Imports AutoCADElectrical.com.vasilchenko.DBAccessConnection
 Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
 
+Imports Autodesk.AutoCAD.EditorInput
+
 Namespace com.vasilchenko.TerminalModules
     Module TerminalClassMapping
 
@@ -12,6 +14,9 @@ Namespace com.vasilchenko.TerminalModules
 
             objTermsArray = GetAllTermsInLocation(strLocation, strTagstrip)
             objMappingTermsCollection = FillTerminalData(objTermsArray, strTagstrip, eDucktSide)
+
+            DrawTerminalBlock.DrawTerminalBlock(objMappingTermsCollection.Item(0), New Autodesk.AutoCAD.Geometry.Point3d,
+                                                 eOrientation, eDucktSide)
 
             Dim ufTTS As New ufTerminalTypeSelector
             With ufTTS
@@ -42,5 +47,4 @@ Namespace com.vasilchenko.TerminalModules
         End Function
 
     End Module
-
 End Namespace

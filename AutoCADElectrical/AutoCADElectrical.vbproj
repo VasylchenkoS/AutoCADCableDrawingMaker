@@ -71,14 +71,17 @@
     <Reference Include="AcCoreMgd">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2017\accoremgd.dll</HintPath>
     </Reference>
     <Reference Include="AcDbMgd">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2017\acdbmgd.dll</HintPath>
     </Reference>
     <Reference Include="AcMgd">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2017\acmgd.dll</HintPath>
     </Reference>
     <!--Map 3D References-->
     <!--Civil 3D Refernces-->
@@ -113,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalWiresDictionaryClass.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalDictionaryClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\GetEnumFromDescriptionAttribute.vb" />
     <Compile Include="src\com\vasilchenko\TerminalForms\ufTerminalSelector.Designer.vb">
       <DependentUpon>ufTerminalSelector.vb</DependentUpon>
@@ -122,8 +125,8 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalAccessoriesMappingClass.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalMappingClass.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalAccessoriesClass.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\WireClass.vb" />
     <Compile Include="src\com\vasilchenko\DBAccessConnection\DBConnection.vb" />
     <Compile Include="src\com\vasilchenko\DBAccessConnection\DBDataAccessObject.vb" />
@@ -154,6 +157,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawingLayerChecker.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\DrawTerminalBlock.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\TerminalClassMapping.vb" />
   </ItemGroup>
   <ItemGroup>

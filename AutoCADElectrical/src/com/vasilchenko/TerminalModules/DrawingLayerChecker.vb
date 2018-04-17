@@ -12,7 +12,7 @@ Namespace com.vasilchenko.TerminalModules
 
             Using acadTransanction As Transaction = acadCurDB.TransactionManager.StartTransaction()
                 Dim acadLayerTbl As LayerTable
-                acadLayerTbl = acadTransanction.GetObject(acadCurDB.LayerTableId, OpenMode.ForWrite)
+                acadLayerTbl = acadTransanction.GetObject(acadCurDB.LayerTableId, OpenMode.ForRead)
 
                 For Each sLayerName As String In objLayerList
                     If acadLayerTbl.Has(sLayerName) = False Then
@@ -49,7 +49,7 @@ Namespace com.vasilchenko.TerminalModules
                                     acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 84)
                             End Select
 
-                            'acadLayerTbl.UpgradeOpen()
+                            acadLayerTbl.UpgradeOpen()
                             acadLayerTbl.Add(acadLayerTblRec)
 
                             acadTransanction.AddNewlyCreatedDBObject(acadLayerTblRec, True)
