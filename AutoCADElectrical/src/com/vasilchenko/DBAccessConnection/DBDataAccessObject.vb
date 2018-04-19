@@ -4,8 +4,8 @@ Imports AutoCADElectrical.com.vasilchenko.TerminalEnums
 
 Namespace com.vasilchenko.DBAccessConnection
     Module DBDataAccessObject
-        Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
-        Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
+        'Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
+        'Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
         Private strConstProjectDatabasePath As String
 
         Public Function GetAllLocations() As ArrayList
@@ -14,7 +14,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objLocationList As New ArrayList
 
             If strConstProjectDatabasePath = "" Then
-                Dim strCustomIconPath As String = Left(Application.AcadApplication.Preferences.Files.CustomIconPath, InStrRev(Application.AcadApplication.Preferences.Files.CustomIconPath, "\",, CompareMethod.Text))
+                Dim strCustomIconPath As String = Left(Application.AcadApplication.Preferences.Files.ToolPalettePath, InStrRev(Application.AcadApplication.Preferences.Files.ToolPalettePath, "\",, CompareMethod.Text))
                 Dim strProjectName As String = Right(Application.AcadApplication.ActiveDocument.Path, Len(Application.AcadApplication.ActiveDocument.Path) - InStrRev(Application.AcadApplication.ActiveDocument.Path, "\",, CompareMethod.Text))
                 strConstProjectDatabasePath = strCustomIconPath & "User\" & UCase(strProjectName) & ".mdb"
             End If
@@ -27,7 +27,7 @@ Namespace com.vasilchenko.DBAccessConnection
 
             strSQLQuery = "SELECT DISTINCT [LOC] FROM TERMS ORDER BY [LOC] DESC"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstProjectDatabasePath)
+            objDataTable = GetOleDBDataTable(strSQLQuery, strConstProjectDatabasePath)
 
             If Not IsNothing(objDataTable) Then
                 For Each objRow In objDataTable.Rows
@@ -48,7 +48,7 @@ Namespace com.vasilchenko.DBAccessConnection
                             "WHERE LOC = '" & UCase(strLocation) & "' " &
                             "ORDER BY [TAGSTRIP] ASC"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstProjectDatabasePath)
+            objDataTable = GetOleDBDataTable(strSQLQuery, strConstProjectDatabasePath)
 
             If Not IsNothing(objDataTable) Then
                 For Each objRow In objDataTable.Rows
@@ -59,10 +59,10 @@ Namespace com.vasilchenko.DBAccessConnection
             Return objLocationList
         End Function
 
-        Public Function GetAllTermsInLocation(strLocation As String, strTagstrip As String) As ArrayList
+        Public Function GetAllTermsInLocation(strLocation As String, strTagstrip As String) As List(Of String)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
-            Dim objLocationList As New ArrayList
+            Dim objLocationList As New List(Of String)
 
             strSQLQuery = "SELECT DISTINCT [TERM] " &
                             "FROM TERMS " &
@@ -70,7 +70,7 @@ Namespace com.vasilchenko.DBAccessConnection
                             "' AND [TERM] <> '' AND [TERM] IS NOT NULL " &
                             "ORDER BY [TERM] ASC"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstProjectDatabasePath)
+            objDataTable = GetOleDBDataTable(strSQLQuery, strConstProjectDatabasePath)
 
             If Not IsNothing(objDataTable) Then
                 For Each objRow In objDataTable.Rows
@@ -93,7 +93,7 @@ Namespace com.vasilchenko.DBAccessConnection
                     "FROM TERMS " &
                     "WHERE [TAGSTRIP] = '" & strTagstrip & "' AND [TERM] = '" & strTermValue & "'"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstProjectDatabasePath)
+            objDataTable = GetOleDBDataTable(strSQLQuery, strConstProjectDatabasePath)
 
             If Not IsNothing(objDataTable) Then
                 For Each objRow In objDataTable.Rows
@@ -109,7 +109,7 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objResultTerminal
         End Function
-        Public Sub FillTerminalBlockPath(ByRef objInputTerminal As TerminalClass)
+        Public Sub FillTerminalBlockPath(ByRef objInputTerminal As TerminalAccessoriesClass)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
 
@@ -117,7 +117,7 @@ Namespace com.vasilchenko.DBAccessConnection
                     "FROM [" & objInputTerminal.MFG & "] " &
                     "WHERE [CATALOG] = '" & objInputTerminal.CAT & "'"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstFootprintPath)
+            objDataTable = GetSQLDBDataTable(strSQLQuery, My.Settings.footprint_lookupSQLConnectionString)
 
             If Not IsNothing(objDataTable) Then objInputTerminal.BLOCK = objDataTable.Rows(0).Item("BLKNAM")
         End Sub
@@ -131,7 +131,7 @@ Namespace com.vasilchenko.DBAccessConnection
                     "WHERE [NAMHDL1] = '" & objInputTerminal.HDL & "' OR [NAMHDL2] = '" & objInputTerminal.HDL & "' " &
                     "ORDER BY [WIRENO]"
 
-            objDataTable = GetOleBdDataReader(strSQLQuery, strConstProjectDatabasePath)
+            objDataTable = GetOleDBDataTable(strSQLQuery, strConstProjectDatabasePath)
 
             If Not IsNothing(objDataTable) Then
                 For Each objRow In objDataTable.Rows
@@ -148,15 +148,15 @@ Namespace com.vasilchenko.DBAccessConnection
                             objWire.Wireno = strWireno
                         End If
                         If .item("NAM1") <> objInputTerminal.P_TAGSTRIP And .item("PIN1") <> objInputTerminal.TERM.ToString Then
-                            objWire.Instance = .item("INST1")
-                            objWire.Name = .item("NAM1")
-                            objWire.Pin = .item("PIN1")
-                            objCable.Location = .item("LOC1")
+                            objWire.Instance = .item("INST1").ToString
+                            objWire.Name = .item("NAM1").ToString
+                            objWire.Pin = .item("PIN1").ToString
+                            objCable.Location = .item("LOC1").ToString
                         Else
-                            objWire.Instance = .item("INST2")
-                            objWire.Name = .item("NAM2")
-                            objWire.Pin = .item("PIN2")
-                            objCable.Location = .item("LOC2")
+                            objWire.Instance = .item("INST2").ToString
+                            objWire.Name = .item("NAM2").ToString
+                            objWire.Pin = .item("PIN2").ToString
+                            objCable.Location = .item("LOC2").ToString
                         End If
 
                         If Not IsDBNull(.Item("CBL")) Then

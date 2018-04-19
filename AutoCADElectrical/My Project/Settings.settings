@@ -2,29 +2,21 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
   <Profiles />
   <Settings>
-    <Setting Name="default_catConnectionString" Type="(Connection string)" Scope="Application">
+    <Setting Name="default_catSQLConnectionString" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb&lt;/ConnectionString&gt;
-  &lt;ProviderName&gt;System.Data.OleDb&lt;/ProviderName&gt;
+  &lt;ConnectionString&gt;Data Source=MANSON;Initial Catalog=default_cat;Integrated Security=True&lt;/ConnectionString&gt;
+  &lt;ProviderName&gt;System.Data.SqlClient&lt;/ProviderName&gt;
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb</Value>
+      <Value Profile="(Default)">Data Source=MANSON;Initial Catalog=default_cat;Integrated Security=True</Value>
     </Setting>
-    <Setting Name="OTHERTESTConnectionString" Type="(Connection string)" Scope="Application">
+    <Setting Name="footprint_lookupSQLConnectionString" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Provider=Microsoft.Jet.OLEDB.4.0;Data Source="C:\Users\v.vasilchenko\AppData\Roaming\Autodesk\AutoCAD Electrical 2017\R21.0\rus\Support\User\OTHERTEST.mdb"&lt;/ConnectionString&gt;
-  &lt;ProviderName&gt;System.Data.OleDb&lt;/ProviderName&gt;
+  &lt;ConnectionString&gt;Data Source=manson;Initial Catalog=footprint_lookup;Integrated Security=True&lt;/ConnectionString&gt;
+  &lt;ProviderName&gt;System.Data.SqlClient&lt;/ProviderName&gt;
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0;Data Source="C:\Users\v.vasilchenko\AppData\Roaming\Autodesk\AutoCAD Electrical 2017\R21.0\rus\Support\User\OTHERTEST.mdb"</Value>
-    </Setting>
-    <Setting Name="footprint_lookupConnectionString" Type="(Connection string)" Scope="Application">
-      <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb&lt;/ConnectionString&gt;
-  &lt;ProviderName&gt;System.Data.OleDb&lt;/ProviderName&gt;
-&lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb</Value>
+      <Value Profile="(Default)">Data Source=manson;Initial Catalog=footprint_lookup;Integrated Security=True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

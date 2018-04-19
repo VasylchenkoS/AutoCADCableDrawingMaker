@@ -66,6 +66,27 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>AutoCADElectrical.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>AutoCADElectrical.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <!--AutoCAD References-->
     <Reference Include="AcCoreMgd">
@@ -105,7 +126,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
@@ -115,6 +138,16 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="default_catDataSet.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>default_catDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="footprint_lookupDataSet.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>footprint_lookupDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalDictionaryClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\GetEnumFromDescriptionAttribute.vb" />
@@ -158,6 +191,7 @@
     </Compile>
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawingLayerChecker.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawTerminalBlock.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddTerminalPhoenixAccessories.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\TerminalClassMapping.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +210,28 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="default_catDataSet.xsc">
+      <DependentUpon>default_catDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="default_catDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>default_catDataSet.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="default_catDataSet.xss">
+      <DependentUpon>default_catDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="footprint_lookupDataSet.xsc">
+      <DependentUpon>footprint_lookupDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="footprint_lookupDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>footprint_lookupDataSet.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="footprint_lookupDataSet.xss">
+      <DependentUpon>footprint_lookupDataSet.xsd</DependentUpon>
+    </None>
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

@@ -57,33 +57,20 @@ Namespace My
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Cat"& _ 
-            "alogs\default_cat.mdb")>  _
-        Public ReadOnly Property default_catConnectionString() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=MANSON;Initial Catalog=default_cat;Integrated Security=True")>  _
+        Public ReadOnly Property default_catSQLConnectionString() As String
             Get
-                Return CType(Me("default_catConnectionString"),String)
+                Return CType(Me("default_catSQLConnectionString"),String)
             End Get
         End Property
         
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=""C:\Users\v.vasilchenko\AppData\Roam"& _ 
-            "ing\Autodesk\AutoCAD Electrical 2017\R21.0\rus\Support\User\OTHERTEST.mdb""")>  _
-        Public ReadOnly Property OTHERTESTConnectionString() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=manson;Initial Catalog=footprint_lookup;Integrated Security=True")>  _
+        Public ReadOnly Property footprint_lookupSQLConnectionString() As String
             Get
-                Return CType(Me("OTHERTESTConnectionString"),String)
-            End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Temp\MyDatabase\Sources\ru-RU\Cat"& _ 
-            "alogs\footprint_lookup.mdb")>  _
-        Public ReadOnly Property footprint_lookupConnectionString() As String
-            Get
-                Return CType(Me("footprint_lookupConnectionString"),String)
+                Return CType(Me("footprint_lookupSQLConnectionString"),String)
             End Get
         End Property
     End Class

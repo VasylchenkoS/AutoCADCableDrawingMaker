@@ -1,5 +1,4 @@
-﻿Imports System.Linq
-Imports System.Text.RegularExpressions
+﻿Imports System.Text.RegularExpressions
 Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
 
 Namespace com.vasilchenko.DBAccessConnection
@@ -96,7 +95,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objTempList As ArrayList
             For lngI As Long = 0 To objInputDictionary.Count - 1
                 objTempList = objInputDictionary.Item(lngI)
-                For lngA As Long = 0 To objInputDictionary.Item(lngI).Count
+                For lngA As Long = 0 To objInputDictionary.Item(lngI).Count - 1
                     If objTempList.Item(lngA).HasCable Then
                         If objTempList.Item(lngA).Cable.Location <> strCurrentLocation Then
                             CableInDictionary = lngI
@@ -105,15 +104,17 @@ Namespace com.vasilchenko.DBAccessConnection
                     End If
                 Next
             Next
+            CableInDictionary = -1
         End Function
 
         Public Function CableInList(objInputList As ArrayList) As Integer
-            For lngA As Long = 0 To objInputList.Count
+            For lngA As Long = 0 To objInputList.Count - 1
                 If objInputList.Item(lngA).HasCable Then
                     CableInList = lngA
                     Exit Function
                 End If
             Next
+            CableInList = -1
         End Function
 
     End Module

@@ -8,7 +8,7 @@
         Private strCAT As String
         Private strWDBLKNAM As String
         Private strBLOCK As String
-        Private lngHEIGHT As Long
+        Private lngHEIGHT As Double
 
         Public Property P_TAGSTRIP As String
             Get
@@ -73,11 +73,11 @@
             End Set
         End Property
 
-        Public Property HEIGHT As Long
+        Public Property HEIGHT As Double
             Get
                 Return lngHEIGHT
             End Get
-            Set(value As Long)
+            Set(value As Double)
                 lngHEIGHT = value
             End Set
         End Property

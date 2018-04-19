@@ -5,18 +5,17 @@ Imports AutoCADElectrical.com.vasilchenko.TerminalModules
 Public Class ufTerminalSelector
 
     Private Sub ufTerminalSelector_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim objLocationList As ArrayList
+        Dim objLocationList As ArrayList = GetAllLocations()
 
         cbxTerminal.Enabled = False
         cbxOrientation.Enabled = False
         cbxDuctSide.Enabled = False
 
-        objLocationList = GetAllLocations()
         If IsNothing(objLocationList) Then
             MsgBox("Проект пуст иил не указаны местоположения", MsgBoxStyle.Critical, "Warning")
             Me.Close()
         End If
-        cbxLocation.DataSource = GetAllLocations()
+        cbxLocation.DataSource = objLocationList
         cbxOrientation.DataSource = New EnumDescriptorCollection(Of TerminalOrientationEnum)
         cbxDuctSide.DataSource = New EnumDescriptorCollection(Of DuctSideEnum)
     End Sub
