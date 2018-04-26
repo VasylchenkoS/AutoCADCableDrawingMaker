@@ -3,7 +3,7 @@ Imports Autodesk.AutoCAD.Colors
 Imports Autodesk.AutoCAD.DatabaseServices
 
 Namespace com.vasilchenko.TerminalModules
-    Module DrawingLayerChecker
+    Module DrawLayerChecker
         Public Sub CheckLayers()
             Dim acadDocument As Document = Core.Application.DocumentManager.MdiActiveDocument
             Dim acadCurDB As Database = acadDocument.Database

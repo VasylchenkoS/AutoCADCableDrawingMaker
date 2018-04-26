@@ -3,7 +3,7 @@ Imports System.Data.SqlClient
 
 Namespace com.vasilchenko.DBAccessConnection
     Module DBConnection
-        Public Function GetOleDBDataTable(strSQLQuery As String, strSourcePath As String) As DataTable
+        Public Function GetOleDataTable(strSQLQuery As String, strSourcePath As String) As DataTable
             Dim strSQLConnectionParameters As String
             Dim objOleDbCommand As OleDbCommand
             Dim objDataTable As New DataTable
@@ -23,7 +23,7 @@ Namespace com.vasilchenko.DBAccessConnection
             End Using
         End Function
 
-        Public Function GetSQLDBDataTable(strSQLQuery As String, strSQLConnectionParameters As String) As DataTable
+        Public Function GetSQLDataTable(strSQLQuery As String, strSQLConnectionParameters As String) As DataTable
             Dim objDataTable As New DataTable
 
             Using objSQLDbConnection As New SqlConnection(strSQLConnectionParameters)

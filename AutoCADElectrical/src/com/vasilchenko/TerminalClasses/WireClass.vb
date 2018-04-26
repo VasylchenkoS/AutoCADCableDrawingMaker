@@ -3,7 +3,7 @@
         Private strWIRENO As String
         Private strINST As String
         Private strNAM As String
-        Private strPIN As String
+        Private strPIN As Integer
         Private strTERMDESC As String
         Private objCABLE As CableClass
 
@@ -42,11 +42,11 @@
                 Me.strNAM = strNameValue
             End Set
         End Property
-        Public Property Pin As String
+        Public Property Pin As Integer
             Get
                 Return Me.strPIN
             End Get
-            Set(strPinValue As String)
+            Set(strPinValue As Integer)
                 Me.strPIN = strPinValue
             End Set
         End Property
@@ -62,10 +62,6 @@
         Public Function HasCable() As Boolean
             HasCable = Not IsNothing(Me.objCABLE)
         End Function
-        Protected Overrides Sub Finalize()
-            Me.objCABLE = Nothing
-            MyBase.Finalize()
-        End Sub
 
     End Class
 

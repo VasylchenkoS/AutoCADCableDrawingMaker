@@ -16,12 +16,12 @@ Namespace com.vasilchenko.TerminalEnums
         <Description("FBS 10-5")> Jumper10
     End Enum
 
-    Public Enum TerminalOrientationEnum
+    Public Enum OrientationEnum
         <Description("Вертикальный")> Vertical
         <Description("Горизонтальный")> Horisontal
     End Enum
 
-    Public Enum DuctSideEnum
+    Public Enum SideEnum
         <Description("Справа")> Rigth
         <Description("Слева")> Left
     End Enum

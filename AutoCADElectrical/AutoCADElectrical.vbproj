@@ -149,8 +149,10 @@
       <DependentUpon>footprint_lookupDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\JumperClass.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalStripClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalDictionaryClass.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalEnums\GetEnumFromDescriptionAttribute.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalEnums\EnumFunctions.vb" />
     <Compile Include="src\com\vasilchenko\TerminalForms\ufTerminalSelector.Designer.vb">
       <DependentUpon>ufTerminalSelector.vb</DependentUpon>
     </Compile>
@@ -189,9 +191,10 @@
     <Compile Include="src\com\vasilchenko\TerminalForms\ufTerminalTypeSelector.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="src\com\vasilchenko\TerminalModules\DrawingLayerChecker.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalModules\DrawTerminalBlock.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalModules\AddTerminalPhoenixAccessories.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\DrawLayerChecker.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\DrawBlocks.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddPhoenixTerminalAccessories.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddPhoenixJumpers.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\TerminalClassMapping.vb" />
   </ItemGroup>
   <ItemGroup>

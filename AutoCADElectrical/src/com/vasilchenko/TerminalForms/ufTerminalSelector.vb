@@ -5,7 +5,7 @@ Imports AutoCADElectrical.com.vasilchenko.TerminalModules
 Public Class ufTerminalSelector
 
     Private Sub ufTerminalSelector_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim objLocationList As ArrayList = GetAllLocations()
+        Dim objLocationList As ArrayList = DBDataAccessObject.GetAllLocations()
 
         cbxTerminal.Enabled = False
         cbxOrientation.Enabled = False
@@ -16,8 +16,8 @@ Public Class ufTerminalSelector
             Me.Close()
         End If
         cbxLocation.DataSource = objLocationList
-        cbxOrientation.DataSource = New EnumDescriptorCollection(Of TerminalOrientationEnum)
-        cbxDuctSide.DataSource = New EnumDescriptorCollection(Of DuctSideEnum)
+        cbxOrientation.DataSource = New EnumDescriptorCollection(Of OrientationEnum)
+        cbxDuctSide.DataSource = New EnumDescriptorCollection(Of SideEnum)
     End Sub
 
     Private Sub cbxLocation_SelectedValueChanged(sender As Object, e As EventArgs) Handles cbxLocation.SelectedValueChanged
@@ -26,7 +26,7 @@ Public Class ufTerminalSelector
         cbxDuctSide.Enabled = False
 
         If cbxLocation.Text <> "" Then
-            cbxTerminal.DataSource = GetAllTagstripInLocation(cbxLocation.Text)
+            cbxTerminal.DataSource = DBDataAccessObject.GetAllTagstripInLocation(cbxLocation.Text)
             cbxTerminal.Enabled = True
         Else : cbxTerminal.Enabled = False
         End If
@@ -48,10 +48,10 @@ Public Class ufTerminalSelector
     Private Sub btnApply_Click(sender As Object, e As EventArgs) Handles btnApply.Click
         If cbxLocation.Text <> "" Or cbxTerminal.Text <> "" Or cbxOrientation.Text <> "" Or cbxDuctSide.Text <> "" Then
             Me.Hide()
-            CreateTerminalBlock(cbxLocation.Text,
+            TerminalClassMapping.CreateTerminalBlock(cbxLocation.Text,
                                     cbxTerminal.Text,
-                                    GetEnumFromDescriptionAttribute(Of TerminalOrientationEnum)(cbxOrientation.Text),
-                                    GetEnumFromDescriptionAttribute(Of DuctSideEnum)(cbxDuctSide.Text))
+                                    EnumFunctions.GetEnumFromDescriptionAttribute(Of OrientationEnum)(cbxOrientation.Text),
+                                    EnumFunctions.GetEnumFromDescriptionAttribute(Of SideEnum)(cbxDuctSide.Text))
             Me.Close()
         Else
             MsgBox("Введите все данные", MsgBoxStyle.Critical, "DataError")

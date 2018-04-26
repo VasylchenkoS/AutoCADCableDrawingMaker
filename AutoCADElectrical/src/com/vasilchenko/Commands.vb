@@ -7,7 +7,7 @@ Namespace com.vasilchenko.Main
         <CommandMethod("DebStart", CommandFlags.Session)>
         Public Shared Sub Main()
             Application.AcadApplication.ActiveDocument.SendCommand("(command ""_-Purge"")(command ""_ALL"")(command ""*"")(command ""_N"")" & vbCr)
-            'Application.AcadApplication.ActiveDocument.SendCommand("AEREBUILDDB" & vbCr)
+            Application.AcadApplication.ActiveDocument.SendCommand("AEREBUILDDB" & vbCr)
 
             Using docLock As DocumentLock = Application.DocumentManager.MdiActiveDocument.LockDocument()
                 Dim objForm = New ufTerminalSelector
