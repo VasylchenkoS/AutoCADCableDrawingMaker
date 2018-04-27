@@ -11,13 +11,6 @@
             Me.objCABLE = New CableClass
         End Sub
 
-        Public ReadOnly Property TermDesc() As String
-            Get
-                Me.strTERMDESC = strNAM & ":" & strPIN
-                TermDesc = Me.strTERMDESC
-            End Get
-        End Property
-
         Public Property Wireno As String
             Get
                 Return Me.strWIRENO
@@ -56,6 +49,18 @@
             End Get
             Set(objCableValue As CableClass)
                 Me.objCABLE = objCableValue
+            End Set
+        End Property
+
+        Public Property TERMDESC As String
+            Get
+                If Me.strTERMDESC = "" Then
+                    Me.strTERMDESC = strNAM & ":" & strPIN
+                End If
+                Return strTERMDESC
+            End Get
+            Set(value As String)
+                Me.strTERMDESC = value
             End Set
         End Property
 

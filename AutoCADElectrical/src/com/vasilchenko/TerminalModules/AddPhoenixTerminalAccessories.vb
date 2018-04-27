@@ -4,32 +4,71 @@ Imports AutoCADElectrical.com.vasilchenko.DBAccessConnection
 
 Namespace com.vasilchenko.TerminalModules
     Module AddPhoenixTerminalAccessories
-        Public Sub AddPhoenixAccForSignalisation(objMappingTermsCollection As List(Of TerminalAccessoriesClass))
-            If objMappingTermsCollection.Count = 0 Then Exit Sub
+        Public Sub AddPhoenixAccForSignalisation(objMappingTermsList As List(Of TerminalAccessoriesClass))
+            If objMappingTermsList.Count = 0 Then Exit Sub
             Dim objCurTerminal As TerminalClass = Nothing
 
-            For index As Integer = 0 To objMappingTermsCollection.Count - 1
+            For index As Integer = 0 To objMappingTermsList.Count - 1
 
-                objCurTerminal = objMappingTermsCollection.Item(index)
+                objCurTerminal = objMappingTermsList.Item(index)
                 If objCurTerminal.TERM = 1 Then
-                    objMappingTermsCollection.Insert(index, EnumFunctions.Convert(AccessoriesPhoenixContactEnum.TerminalMarker, objCurTerminal))
-                    objMappingTermsCollection.Insert(index + 1, GetCoverObject(objCurTerminal))
+                    objMappingTermsList.Insert(index, EnumFunctions.Convert(AccessoriesPhoenixContactEnum.TerminalMarker, objCurTerminal))
+                    objMappingTermsList.Insert(index + 1, GetCoverObject(objCurTerminal))
                     index = index + 2
                 ElseIf objCurTerminal.TERM = 8 Or objCurTerminal.TERM = 24 Then
-                    objMappingTermsCollection.Insert(index + 1, GetCoverObject(objCurTerminal))
+                    objMappingTermsList.Insert(index + 1, GetCoverObject(objCurTerminal))
                     index = index + 1
                 Else
-                    If CInt(objCurTerminal.TERM) Mod 32 = 0 Then
-                        objMappingTermsCollection.Insert(index + 1, GetPlateObject(objCurTerminal))
+                    If objCurTerminal.TERM Mod 32 = 0 Then
+                        objMappingTermsList.Insert(index + 1, GetPlateObject(objCurTerminal))
                         index = index + 1
-                    ElseIf CInt(objCurTerminal.TERM) Mod 16 = 0 Then
-                        objMappingTermsCollection.Insert(index + 1, GetCoverObject(objCurTerminal))
+                    ElseIf objCurTerminal.TERM Mod 16 = 0 Then
+                        objMappingTermsList.Insert(index + 1, GetCoverObject(objCurTerminal))
                         index = index + 1
                     End If
                 End If
             Next
-            objMappingTermsCollection.Add(GetCoverObject(objCurTerminal))
-            objMappingTermsCollection.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))
+            objMappingTermsList.Add(GetCoverObject(objCurTerminal))
+            objMappingTermsList.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))
+        End Sub
+
+        Friend Sub AddPhoenixAccForControl(objMappingTermsList As List(Of TerminalAccessoriesClass))
+            If objMappingTermsList.Count = 0 Then Exit Sub
+            Dim objCurTerminal As TerminalClass = Nothing
+
+            For index As Integer = 0 To objMappingTermsList.Count - 1
+                objCurTerminal = objMappingTermsList.Item(index)
+                If objCurTerminal.TERM = 1 Then
+                    objMappingTermsList.Insert(index, EnumFunctions.Convert(AccessoriesPhoenixContactEnum.TerminalMarker, objCurTerminal))
+                    objMappingTermsList.Insert(index + 1, GetCoverObject(objCurTerminal))
+                    index = index + 2
+                ElseIf objCurTerminal.TERM Mod 5 = 0 Then
+                    objMappingTermsList.Insert(index + 1, GetPlateObject(objCurTerminal))
+                    index = index + 1
+                End If
+            Next
+            objMappingTermsList.Add(GetCoverObject(objCurTerminal))
+            objMappingTermsList.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))
+        End Sub
+
+        Friend Sub AddPhoenixAccForMeasurement(objMappingTermsList As List(Of TerminalAccessoriesClass))
+            If objMappingTermsList.Count = 0 Then Exit Sub
+            Dim objCurTerminal As TerminalClass = Nothing
+
+            For index As Integer = 0 To objMappingTermsList.Count - 1
+
+                objCurTerminal = objMappingTermsList.Item(index)
+                If objCurTerminal.TERM = 1 Then
+                    objMappingTermsList.Insert(index, EnumFunctions.Convert(AccessoriesPhoenixContactEnum.TerminalMarker, objCurTerminal))
+                    objMappingTermsList.Insert(index + 1, GetCoverObject(objCurTerminal))
+                    index = index + 2
+                ElseIf objCurTerminal.TERM Mod 16 = 0 Then
+                    objMappingTermsList.Insert(index + 1, GetPlateObject(objCurTerminal))
+                    index = index + 1
+                End If
+            Next
+            objMappingTermsList.Add(GetCoverObject(objCurTerminal))
+            objMappingTermsList.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))
         End Sub
 
         Private Function GetCoverObject(objCurTerminal As TerminalClass) As TerminalAccessoriesClass

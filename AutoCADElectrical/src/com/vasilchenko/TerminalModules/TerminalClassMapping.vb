@@ -32,7 +32,9 @@ Namespace com.vasilchenko.TerminalModules
                 If .rbtnSignalisation.Checked Then
                     AddPhoenixTerminalAccessories.AddPhoenixAccForSignalisation(objTerminalStripList.TerminalList)
                 ElseIf .rbtnMeasurement.Checked Then
+                    AddPhoenixTerminalAccessories.AddPhoenixAccForMeasurement(objTerminalStripList.TerminalList)
                 ElseIf .rbtnControl.Checked Then
+                    AddPhoenixTerminalAccessories.AddPhoenixAccForControl(objTerminalStripList.TerminalList)
                 ElseIf .rbtnPower.Checked Then
                 Else
                     Exit Sub

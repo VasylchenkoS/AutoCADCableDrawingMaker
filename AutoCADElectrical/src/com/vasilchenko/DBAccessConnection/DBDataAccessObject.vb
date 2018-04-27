@@ -141,7 +141,7 @@ Namespace com.vasilchenko.DBAccessConnection
                 Debug.Print("")
             End If
 
-            strSQLQuery = "SELECT [WIRENO], [INST1], [LOC1],[NAM1], [PIN1], [INST2], [LOC2],[NAM2], [PIN2], [CBL] " &
+            strSQLQuery = "SELECT [WIRENO], [INST1], [LOC1],[NAM1], [PIN1], [INST2], [LOC2],[NAM2], [PIN2], [CBL], [TERMDESC1], [TERMDESC2] " &
                     "FROM WFRM2ALL " &
                     "WHERE [NAMHDL1] = '" & objInputTerminal.HDL & "' OR [NAMHDL2] = '" & objInputTerminal.HDL & "' " &
                     "ORDER BY [WIRENO]"
@@ -168,16 +168,19 @@ Namespace com.vasilchenko.DBAccessConnection
                             objWire.Name = .item("NAM1").ToString
                             objWire.Pin = CInt(.item("PIN1"))
                             objCable.Location = .item("LOC1").ToString
+                            objWire.TERMDESC = .item("TERMDESC1").ToString
                         ElseIf Not .item("PIN1").Equals(objInputTerminal.TERM.ToString) Then
                             objWire.Instance = .item("INST1").ToString
                             objWire.Name = .item("NAM1").ToString
                             objWire.Pin = CInt(.item("PIN1"))
                             objCable.Location = .item("LOC1").ToString
+                            objWire.TERMDESC = .item("TERMDESC1").ToString
                         Else
                             objWire.Instance = .item("INST2").ToString
                             objWire.Name = .item("NAM2").ToString
                             objWire.Pin = CInt(.item("PIN2"))
                             objCable.Location = .item("LOC2").ToString
+                            objWire.TERMDESC = .item("TERMDESC2").ToString
                         End If
 
                         If Not IsDBNull(.Item("CBL")) Then

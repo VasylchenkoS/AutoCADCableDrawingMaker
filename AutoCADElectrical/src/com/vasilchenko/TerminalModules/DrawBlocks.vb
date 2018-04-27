@@ -9,8 +9,6 @@ Namespace com.vasilchenko.TerminalModules
         Public Sub DrawTerminalBlock(acDatabase As Database, acTransaction As Transaction,
                                      ByRef objInputTerminal As TerminalClass, acInsertPt As Point3d, dblScale As Double, Optional dblRotation As Double = 0.0)
 
-            'Добавить логику прорисовки клемм МТ (180* разворот)
-
             Dim strBlkName As String = SymbolUtilityServices.GetBlockNameFromInsertPathName(objInputTerminal.BLOCK)
             Dim acBlockTable As BlockTable = acTransaction.GetObject(acDatabase.BlockTableId, OpenMode.ForRead)
             Dim acInsObjectID As ObjectId
@@ -27,8 +25,9 @@ Namespace com.vasilchenko.TerminalModules
             Using acBlkRef As New BlockReference(acInsertPt, acInsObjectID)
                 acBlkRef.Layer = "PSYMS"
                 acBlkRef.ScaleFactors = New Scale3d(dblScale)
-                acBlkRef.Rotation = dblRotation
+
                 Dim acBlockTableRecord As BlockTableRecord = acTransaction.GetObject(acBlockTable.Item(BlockTableRecord.ModelSpace), OpenMode.ForWrite)
+
                 acBlockTableRecord.AppendEntity(acBlkRef)
                 acTransaction.AddNewlyCreatedDBObject(acBlkRef, True)
 
@@ -102,6 +101,15 @@ Namespace com.vasilchenko.TerminalModules
 
                         acBlkRef.AttributeCollection.AppendAttribute(acAttrbReference)
                         acTransaction.AddNewlyCreatedDBObject(acAttrbReference, True)
+
+                        If dblRotation = 180 Then
+                            Dim acPtFrom As Point3d = acInsertPt
+                            Dim acPtTo As Point3d = New Point3d(acInsertPt.X, acInsertPt.Y - 5, acInsertPt.Z)
+                            Dim acLine3d As Line3d = New Line3d(acPtFrom, acPtTo)
+                            acBlkRef.TransformBy(Matrix3d.Mirroring(acLine3d))
+                            acAttrbReference.TransformBy(Matrix3d.Mirroring(acLine3d))
+                        End If
+
                     End If
                 Next
             End Using

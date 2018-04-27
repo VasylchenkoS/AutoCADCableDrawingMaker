@@ -11,25 +11,26 @@
         Me.Dispose()
     End Sub
 
-    Private Sub rbtnControl_CheckedChanged(sender As Object, e As EventArgs) Handles rbtnControl.CheckedChanged
+    Private Sub rbtnControl_Click(sender As Object, e As EventArgs) Handles rbtnControl.Click
         Me.rbtnSignalisation.Checked = False
         Me.rbtnMeasurement.Checked = False
         Me.rbtnPower.Checked = False
     End Sub
 
-    Private Sub rbtnMeasurement_CheckedChanged(sender As Object, e As EventArgs) Handles rbtnMeasurement.CheckedChanged
+    Private Sub rbtnMeasurement_Click(sender As Object, e As EventArgs) Handles rbtnMeasurement.Click
         Me.rbtnSignalisation.Checked = False
         Me.rbtnControl.Checked = False
         Me.rbtnPower.Checked = False
     End Sub
 
-    Private Sub rbtnPower_CheckedChanged(sender As Object, e As EventArgs) Handles rbtnPower.CheckedChanged
+
+    Private Sub rbtnPower_Click(sender As Object, e As EventArgs) Handles rbtnPower.Click
         Me.rbtnSignalisation.Checked = False
         Me.rbtnMeasurement.Checked = False
         Me.rbtnControl.Checked = False
     End Sub
 
-    Private Sub rbtnSignalisation_CheckedChanged(sender As Object, e As EventArgs) Handles rbtnSignalisation.CheckedChanged
+    Private Sub rbtnSignalisation_Click(sender As Object, e As EventArgs) Handles rbtnSignalisation.Click
         Me.rbtnMeasurement.Checked = False
         Me.rbtnControl.Checked = False
         Me.rbtnPower.Checked = False
