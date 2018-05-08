@@ -143,6 +143,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>default_catDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="default_catDataSet.vb">
+      <DependentUpon>default_catDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="footprint_lookupDataSet.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

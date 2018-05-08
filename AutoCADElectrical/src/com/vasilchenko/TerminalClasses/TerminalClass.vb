@@ -5,8 +5,8 @@
         Implements IComparable(Of TerminalClass)
 
         Private intTERM As Integer
-        Private objWiresLeft As ArrayList
-        Private objWiresRigth As ArrayList
+        Private objWiresLeft As List(Of WireClass)
+        Private objWiresRigth As List(Of WireClass)
         Private objWireLeft As WireClass
         Private objWireRigth As WireClass
         Private strHDL As String
@@ -51,21 +51,21 @@
             End Set
         End Property
 
-        Public ReadOnly Property WiresLeftList As ArrayList
+        Public ReadOnly Property WiresLeftList As List(Of WireClass)
             Get
                 Return objWiresLeft
             End Get
         End Property
 
-        Public ReadOnly Property WiresRigthList As ArrayList
+        Public ReadOnly Property WiresRigthList As List(Of WireClass)
             Get
                 Return objWiresRigth
             End Get
         End Property
 
         Public Sub New()
-            Me.objWiresLeft = New ArrayList
-            Me.objWiresRigth = New ArrayList
+            Me.objWiresLeft = New List(Of WireClass)
+            Me.objWiresRigth = New List(Of WireClass)
         End Sub
 
         Protected Overrides Sub Finalize()

@@ -3,8 +3,8 @@ Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
 
 Namespace com.vasilchenko.DBAccessConnection
     Module WiresAdditionalFunctions
-        Public Sub IdentityTags(ByVal objInputDictionary As TerminalDictionaryClass(Of String, ArrayList))
-            Dim objConnectionList As ArrayList
+        Public Sub IdentityTags(ByVal objInputDictionary As TerminalDictionaryClass(Of String, List(Of WireClass)))
+            Dim objConnectionList As List(Of WireClass)
             Dim objTempWireI As WireClass
             Dim objTempWireY As WireClass
 
@@ -37,8 +37,8 @@ Namespace com.vasilchenko.DBAccessConnection
             End If
         End Function
 
-        Public Sub SortCollectionByInstAndCables(ByRef objInputDictionary As TerminalDictionaryClass(Of String, ArrayList))
-            Dim objConnectionList As ArrayList
+        Public Sub SortCollectionByInstAndCables(ByRef objInputDictionary As TerminalDictionaryClass(Of String, List(Of WireClass)))
+            Dim objConnectionList As List(Of WireClass)
             Dim objTempWire As WireClass
 
             For intA As Integer = 0 To objInputDictionary.Count - 1
@@ -61,10 +61,10 @@ Namespace com.vasilchenko.DBAccessConnection
             Next
         End Sub
 
-        Public Sub SortDictionaryByInstAndCables(ByRef objInputDictionary As TerminalDictionaryClass(Of String, ArrayList), strPanelLocation As String)
-            Dim objConnectionListF As ArrayList
-            Dim objConnectionListS As ArrayList
-            Dim objTempList As ArrayList
+        Public Sub SortDictionaryByInstAndCables(ByRef objInputDictionary As TerminalDictionaryClass(Of String, List(Of WireClass)), strPanelLocation As String)
+            Dim objConnectionListF As List(Of WireClass)
+            Dim objConnectionListS As List(Of WireClass)
+            Dim objTempList As List(Of WireClass)
 
             Dim blnKF, blnKS, blnCF, blnCS As Boolean
 
@@ -96,7 +96,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Next
         End Sub
 
-        Public Function CableInList(objInputList As ArrayList) As Integer
+        Public Function CableInList(objInputList As List(Of WireClass)) As Integer
             For lngA As Long = 0 To objInputList.Count - 1
                 If objInputList.Item(lngA).HasCable Then
                     CableInList = lngA

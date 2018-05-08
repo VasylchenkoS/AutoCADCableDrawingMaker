@@ -3,7 +3,7 @@
         Private strWIRENO As String
         Private strINST As String
         Private strNAM As String
-        Private strPIN As Integer
+        Private strPIN As String
         Private strTERMDESC As String
         Private objCABLE As CableClass
 
@@ -35,11 +35,11 @@
                 Me.strNAM = strNameValue
             End Set
         End Property
-        Public Property Pin As Integer
+        Public Property Pin As String
             Get
                 Return Me.strPIN
             End Get
-            Set(strPinValue As Integer)
+            Set(strPinValue As String)
                 Me.strPIN = strPinValue
             End Set
         End Property

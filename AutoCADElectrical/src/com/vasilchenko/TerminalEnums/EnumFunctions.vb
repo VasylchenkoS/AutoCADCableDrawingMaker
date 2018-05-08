@@ -33,7 +33,7 @@ Namespace com.vasilchenko.TerminalEnums
             objTerminalAcc.LOC = objCurTerminal.LOC
             objTerminalAcc.MFG = "Phoenix Contact"
             objTerminalAcc.CAT = New EnumDescriptor(Of AccessoriesPhoenixContactEnum)(eAccEnum).ToString
-            DBDataAccessObject.FillTerminalBlockPath(objTerminalAcc)
+            DBDataAccessObject.FillSingleTerminalBlockPath(objTerminalAcc)
             Return objTerminalAcc
         End Function
     End Module

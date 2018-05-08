@@ -117,10 +117,13 @@ Namespace com.vasilchenko.TerminalModules
             For Each strTempItem As String In objInputList
                 objResultArray.Add(DBDataAccessObject.FillTermTypeData(strTagstrip, strTempItem))
             Next
-            For Each objTempItem As TerminalClass In objResultArray
-                DBDataAccessObject.FillTerminalBlockPath(objTempItem)
-                DBDataAccessObject.FillTerminalConnectionsData(objTempItem, eDucktSide)
-            Next
+            DBDataAccessObject.FillTerminalBlockPath(objResultArray)
+            DBDataAccessObject.FillTerminalConnectionsData(objResultArray, eDucktSide)
+
+            'For Each objTempItem As TerminalClass In objResultArray
+            '    DBDataAccessObject.FillTerminalBlockPath(objTempItem)
+            '    DBDataAccessObject.FillTerminalConnectionsData(objTempItem, eDucktSide)
+            'Next
 
             Return objResultArray
 

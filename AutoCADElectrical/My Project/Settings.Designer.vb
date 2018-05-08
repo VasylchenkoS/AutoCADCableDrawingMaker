@@ -57,7 +57,8 @@ Namespace My
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=MANSON;Initial Catalog=default_cat;Integrated Security=True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=MANSON;Initial Catalog=eknis_asu_default_cat;Integrated Security=True"& _ 
+            "")>  _
         Public ReadOnly Property default_catSQLConnectionString() As String
             Get
                 Return CType(Me("default_catSQLConnectionString"),String)
@@ -67,7 +68,8 @@ Namespace My
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=manson;Initial Catalog=footprint_lookup;Integrated Security=True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=manson;Initial Catalog=eknis_asu_footprint_lookup;Integrated Security"& _ 
+            "=True")>  _
         Public ReadOnly Property footprint_lookupSQLConnectionString() As String
             Get
                 Return CType(Me("footprint_lookupSQLConnectionString"),String)
