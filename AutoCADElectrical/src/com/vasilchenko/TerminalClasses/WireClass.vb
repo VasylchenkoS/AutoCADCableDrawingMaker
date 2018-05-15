@@ -54,7 +54,7 @@
 
         Public Property TERMDESC As String
             Get
-                If Me.strTERMDESC = "" Then
+                If Me.strTERMDESC.Equals("") Then
                     Me.strTERMDESC = strNAM & ":" & strPIN
                 End If
                 Return strTERMDESC

@@ -2,13 +2,13 @@
 
     Public Class CableClass
         Private strMARK As String
-        Private strLOCATION As String
-        Public Property Location As String
+        Private strDESTINATION As String
+        Public Property Destination As String
             Get
-                Return Me.strLOCATION
+                Return Me.strDESTINATION
             End Get
             Set(strLocationValue As String)
-                Me.strLOCATION = strLocationValue
+                Me.strDESTINATION = strLocationValue
             End Set
         End Property
         Public Property Mark As String

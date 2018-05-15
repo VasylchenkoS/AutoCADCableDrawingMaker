@@ -8,7 +8,6 @@ Namespace com.vasilchenko.DBAccessConnection
         'Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
         'Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
         Private strConstProjectDatabasePath As String
-
         Public Function GetAllLocations() As ArrayList
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -41,13 +40,11 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objLocationList
         End Function
-
         Private Function FillProjectDataPath() As String
             Dim strCustomIconPath As String = Left(Application.AcadApplication.Preferences.Files.ToolPalettePath, InStrRev(Application.AcadApplication.Preferences.Files.ToolPalettePath, "\",, CompareMethod.Text))
             Dim strProjectName As String = Right(Application.AcadApplication.ActiveDocument.Path, Len(Application.AcadApplication.ActiveDocument.Path) - InStrRev(Application.AcadApplication.ActiveDocument.Path, "\",, CompareMethod.Text))
             FillProjectDataPath = strCustomIconPath & "User\" & UCase(strProjectName) & ".mdb"
         End Function
-
         Public Function GetAllTagstripInLocation(strLocation As String) As ArrayList
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -68,7 +65,6 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objLocationList
         End Function
-
         Public Function GetAllTermsInLocation(strLocation As String, strTagstrip As String) As List(Of String)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -89,7 +85,6 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objLocationList
         End Function
-
         Public Function FillTermTypeData(strTagstrip As String, strTermValue As String) As TerminalClass
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -118,7 +113,6 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objResultTerminal
         End Function
-
         Public Sub FillTerminalBlockPath(ByRef objInputList As List(Of TerminalAccessoriesClass))
             For Each objInputTerminal As TerminalClass In objInputList
                 FillSingleTerminalBlockPath(objInputTerminal)
@@ -134,9 +128,6 @@ Namespace com.vasilchenko.DBAccessConnection
             objDataTable = DBConnection.GetSQLDataTable(strSQLQuery, My.Settings.footprint_lookupSQLConnectionString)
             If Not IsNothing(objDataTable) Then objInputTerminal.BLOCK = objDataTable.Rows(0).Item("BLKNAM")
         End Sub
-
-        'тут хуйняхуйовая )))
-
         Public Sub FillTerminalConnectionsData(ByRef objInputList As List(Of TerminalAccessoriesClass), eDucktSide As SideEnum)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -146,66 +137,68 @@ Namespace com.vasilchenko.DBAccessConnection
 
                 Dim objWiresDictionary As New TerminalDictionaryClass(Of String, List(Of WireClass))
 
-                If objInputTerminal.TERM = 16 Then
-                    Debug.Print("")
-                End If
-
-                strSQLQuery = "SELECT [WIRENO], [INST1], [LOC1],[NAM1], [PIN1], [INST2], [LOC2],[NAM2], [PIN2], [CBL], [TERMDESC1], [TERMDESC2] " &
-                    "FROM WFRM2ALL " &
-                    "WHERE ([NAMHDL1] = '" & objInputTerminal.HDL & "' OR [NAMHDL2] = '" & objInputTerminal.HDL & "') " &
-                    "AND ([NAM1] IS NOT NULL AND [PIN1] IS NOT NULL AND [NAM2] IS NOT NULL AND [PIN2] IS NOT NULL) " &
-                    "ORDER BY [WIRENO]"
+                strSQLQuery = "SELECT [WIRENO], [INST1], [LOC1], [NAM1], [PIN1], [INST2], [LOC2], [NAM2], [PIN2], [CBL], [TERMDESC1], [TERMDESC2], [NAMHDL1] " &
+                                "FROM WFRM2ALL " &
+                                "WHERE ([NAMHDL1] = '" & objInputTerminal.HDL & "' OR [NAMHDL2] = '" & objInputTerminal.HDL & "') " &
+                                "AND ([NAM1] IS NOT NULL AND [PIN1] IS NOT NULL AND [NAM2] IS NOT NULL AND [PIN2] IS NOT NULL) " &
+                                "ORDER BY [WIRENO]"
 
                 objDataTable = DBConnection.GetOleDataTable(strSQLQuery, strConstProjectDatabasePath)
 
                 If Not IsNothing(objDataTable) Then
+                    Dim strWireno As String = ""
+
                     For Each objRow In objDataTable.Rows
+
                         Dim objWire As New WireClass
                         Dim objCable As New CableClass
                         Dim objWiresList As New List(Of WireClass)
-                        Dim strWireno As String = ""
-                        With objRow
-                            If IsDBNull(.item("WIRENO")) Then
-                                MsgBox("Не промеркирована цепь для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM & ". Промаркируйте и перезапустите программу", vbCritical, "Error")
+
+                        For shtI As Short = 0 To 8
+                            If IsDBNull(objRow.ItemArray(shtI)) Then
+                                MsgBox("Не указано значение " & objRow.Table.Columns(shtI).ToString & " для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM & ". Исправте и перезапустите программу", MsgBoxStyle.Critical, "Error")
                                 Throw New ArgumentNullException
+                            End If
+                        Next
+
+                        With objRow
+                            strWireno = .Item("WIRENO")
+                            objWire.Wireno = strWireno
+
+                            If .Item("NAMHDL1").Equals(objInputTerminal.HDL) Then
+                                objWire.Instance = .Item("INST2").ToString
+                                objWire.Name = .Item("NAM2").ToString
+                                objWire.Pin = .Item("PIN2").ToString
+                                objCable.Destination = .Item("LOC2").ToString
+                                objWire.TERMDESC = .Item("TERMDESC2").ToString
                             Else
-                                strWireno = .item("WIRENO")
-                                objWire.Wireno = strWireno
+                                objWire.Instance = .Item("INST1").ToString
+                                objWire.Name = .Item("NAM1").ToString
+                                objWire.Pin = .Item("PIN1").ToString
+                                objCable.Destination = .Item("LOC1").ToString
+                                objWire.TERMDESC = .Item("TERMDESC1").ToString
                             End If
 
-                            If Not .item("NAM1") = objInputTerminal.P_TAGSTRIP Then
-                                objWire.Instance = .item("INST1").ToString
-                                objWire.Name = .item("NAM1").ToString
-                                objWire.Pin = .item("PIN1").ToString
-                                objCable.Location = .item("LOC1").ToString
-                                objWire.TERMDESC = .item("TERMDESC1").ToString
-                            ElseIf Not .item("PIN1") = objInputTerminal.TERM.ToString Then
-                                objWire.Instance = .item("INST1").ToString
-                                objWire.Name = .item("NAM1").ToString
-                                objWire.Pin = .item("PIN1").ToString
-                                objCable.Location = .item("LOC1").ToString
-                                objWire.TERMDESC = .item("TERMDESC1").ToString
+                            If IsDBNull(.Item("CBL")) Then
+                                objWire.Cable = Nothing
                             Else
-                                objWire.Instance = .item("INST2").ToString
-                                objWire.Name = .item("NAM2").ToString
-                                objWire.Pin = .item("PIN2").ToString
-                                objCable.Location = .item("LOC2").ToString
-                                objWire.TERMDESC = .item("TERMDESC2").ToString
-                            End If
-
-                            If Not IsDBNull(.Item("CBL")) Then
-                                objCable.Mark = .item("CBL")
+                                objCable.Mark = .Item("CBL")
                                 objWire.Cable = objCable
-                            Else objWire.Cable = Nothing
                             End If
-                            If objWiresDictionary.ContainsKey(strWireno) Then
-                                objWiresDictionary.Item(strWireno).Add(objWire)
-                            Else
-                                objWiresList.Add(objWire)
-                                objWiresDictionary.Add(key:=strWireno, value:=objWiresList)
+
+                            If objWire.TERMDESC.Equals("E") OrElse objWire.TERMDESC.Equals("I") Then
+                                objWire.TERMDESC = ""
                             End If
                         End With
-                    Next objRow
+
+                        If objWiresDictionary.ContainsKey(strWireno) Then
+                            objWiresDictionary.Item(strWireno).Add(objWire)
+                        Else
+                            objWiresList.Add(objWire)
+                            objWiresDictionary.Add(key:=strWireno, value:=objWiresList)
+                        End If
+
+                    Next
                 End If
 
                 If objWiresDictionary.Count <> 0 Then
@@ -214,60 +207,109 @@ Namespace com.vasilchenko.DBAccessConnection
                     WiresAdditionalFunctions.SortCollectionByInstAndCables(objWiresDictionary)
                     WiresAdditionalFunctions.SortDictionaryByInstAndCables(objWiresDictionary, objInputTerminal.LOC)
 
+                    If objInputTerminal.TERM = 5 Then
+                        Debug.Print("")
+                    End If
+
                     If objWiresDictionary.Count > 2 Then
                         acEditor.WriteMessage("[WARNING]:Слишком много разной маркировки проводов для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM)
                         Throw New ArgumentOutOfRangeException
                     ElseIf objWiresDictionary.Count = 1 Then
                         Dim objTempList As List(Of WireClass) = objWiresDictionary.Item(0)
                         Dim intCableNum As Integer = WiresAdditionalFunctions.CableInList(objTempList)
-                        If eDucktSide.Equals(SideEnum.Rigth) Then
-                            For intA As Integer = 0 To objTempList.Count - 1
-                                If intA <> intCableNum And objInputTerminal.WiresRigthList.Count < 2 Then
-                                    objInputTerminal.WireRigth = objTempList.Item(intA)
-                                ElseIf objInputTerminal.WiresLeftList.Count < 2 Then
-                                    objInputTerminal.WireLeft = objTempList.Item(intA)
-                                Else
-                                    acEditor.WriteMessage("[WARNING]:Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM)
-                                End If
-                            Next
+
+                        Dim objA = objTempList.FindAll(Function(x) x.Wireno.StartsWith("D"))
+                        Dim objB = objTempList.Find(Function(x) x.Wireno.StartsWith("S"))
+                        If objTempList.Find(Function(x) x.Wireno.StartsWith("S")) IsNot Nothing Then
+                            objB = objTempList.Find(Function(x) x.Wireno.StartsWith("S"))
+                        ElseIf objTempList.Find(Function(x) x.Wireno.StartsWith("C")) IsNot Nothing Then
+                            objB = objTempList.Find(Function(x) x.Wireno.StartsWith("C"))
+                        ElseIf objTempList.Find(Function(x) x.Wireno.StartsWith("M")) IsNot Nothing Then
+                            objB = objTempList.Find(Function(x) x.Wireno.StartsWith("M"))
+                        End If
+
+                        'If eDucktSide.Equals(SideEnum.Rigth) Then
+                        If intCableNum <> -1 Then
+                            objInputTerminal.AddWireLeft = objTempList.Item(intCableNum)
+                            objTempList.RemoveAt(intCableNum)
+                            objInputTerminal.WiresRigthList = (From l In objTempList
+                                                               Select l).ToList
                         Else
-                            For intA As Integer = 0 To objTempList.Count - 1
-                                If intA <> intCableNum And objInputTerminal.WiresLeftList.Count < 2 Then
-                                    objInputTerminal.WireLeft = objTempList.Item(intA)
-                                ElseIf objInputTerminal.WiresRigthList.Count < 2 Then
-                                    objInputTerminal.WireRigth = objTempList.Item(intA)
+                            If objA IsNot Nothing Then
+                                objInputTerminal.WiresLeftList = objA
+                                objTempList.RemoveAll(Function(x) x.Wireno.StartsWith("D"))
+                            ElseIf objB IsNot Nothing Then
+                                objInputTerminal.AddWireRigth = objB
+                                objTempList.Remove(objB)
+                            End If
+
+                            For i As Short = 0 To objTempList.Count - 1
+                                If (i + 1) Mod 2 = 0 Then
+                                    objInputTerminal.AddWireLeft = objTempList.Item(i)
                                 Else
-                                    acEditor.WriteMessage("[WARNING]:Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM)
+                                    objInputTerminal.AddWireRigth = objTempList.Item(i)
                                 End If
                             Next
                         End If
-                    ElseIf objWiresDictionary.Count = 2 Then
-                        For intI As Integer = 0 To objWiresDictionary.Count - 1
-                            Dim objTempList = objWiresDictionary.Item(intI)
-                            Dim intCableNum = WiresAdditionalFunctions.CableInList(objTempList)
-                            If eDucktSide.Equals(SideEnum.Rigth) And objInputTerminal.WiresRigthList.Count = 0 Then
-                                For intA As Integer = 0 To objTempList.Count - 1
-                                    objInputTerminal.WireRigth = objTempList.Item(intA)
-                                    If objInputTerminal.WiresRigthList.Count > 2 Then
-                                        acEditor.WriteMessage("[WARNING]:Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM)
-                                    End If
-                                Next
-                            Else
-                                For intA As Integer = 0 To objTempList.Count - 1
-                                    objInputTerminal.WireLeft = objTempList.Item(intA)
-                                    If objInputTerminal.WiresLeftList.Count > 2 Then
-                                        acEditor.WriteMessage("[WARNING]:Слишком много соединений для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM)
-                                    End If
-                                Next
-                            End If
-                        Next
-                    End If
+                        ''Else
+                        'If intCableNum <> -1 Then
+                        '    objInputTerminal.AddWireRigth = objTempList.Item(intCableNum)
+                        '    objTempList.RemoveAt(intCableNum)
+                        '    objInputTerminal.WiresLeftList = (From l In objTempList
+                        '                                      Select l).ToList
+                        'Else
+                        '    If objA IsNot Nothing Then
+                        '        objInputTerminal.WiresRigthList = objA
+                        '        objTempList.RemoveAll(Function(x) x.Wireno.StartsWith("D"))
+                        '    ElseIf objB IsNot Nothing Then
+                        '        objInputTerminal.AddWireLeft = objB
+                        '        objTempList.Remove(objB)
+                        '    End If
 
+                        '    For i As Short = 0 To objTempList.Count - 1
+                        '        If (i + 1) Mod 2 = 0 Then
+                        '            objInputTerminal.AddWireRigth = objTempList.Item(i)
+                        '        Else
+                        '            objInputTerminal.AddWireLeft = objTempList.Item(i)
+                        '        End If
+                        '    Next
+                        'End If
+                        'End If
+                    ElseIf objWiresDictionary.Count = 2 Then
+
+                        Dim objTempListA As List(Of WireClass) = objWiresDictionary.Item(0)
+                        Dim objTempListB As List(Of WireClass) = objWiresDictionary.Item(1)
+
+                        'If eDucktSide.Equals(SideEnum.Rigth) Then
+                        'objTempListA = objWiresDictionary.Item(0)
+                        'objTempListB = objWiresDictionary.Item(1)
+                        'Else
+                        '    objTempListA = objWiresDictionary.Item(1)
+                        '    objTempListB = objWiresDictionary.Item(0)
+                        'End If
+
+                        If WiresAdditionalFunctions.CableInList(objTempListA) <> -1 Then
+                            objInputTerminal.WiresLeftList = objTempListA
+                            objInputTerminal.WiresRigthList = objTempListB
+                        Else
+                            Dim blnFlagA = objTempListA.Any(Function(x) x.Wireno.StartsWith("D"))
+                            Dim blnFlagB = objTempListB.Any(Function(x) x.Wireno.StartsWith("S")) OrElse
+                            objTempListB.Any(Function(x) x.Wireno.StartsWith("C")) OrElse
+                            objTempListB.Any(Function(x) x.Wireno.StartsWith("M"))
+
+                            If blnFlagB Or blnFlagA Then
+                                objInputTerminal.WiresLeftList = objTempListA
+                                objInputTerminal.WiresRigthList = objTempListB
+                            Else
+                                objInputTerminal.WiresRigthList = objTempListA
+                                objInputTerminal.WiresLeftList = objTempListB
+                            End If
+                        End If
+
+                    End If
                 End If
             Next
-
         End Sub
-
         Public Function FillJumperData(strTagstrip As String) As List(Of JumperClass)
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
@@ -280,7 +322,7 @@ Namespace com.vasilchenko.DBAccessConnection
                             "(SELECT Min(CInt([TERM])) AS V1, FIRST([CAT]) AS V3, FIRST([MFG]) AS V4 , FIRST([INST]) AS V5 , FIRST([LOC]) AS V6 " &
                             "FROM TERMS " &
                             "WHERE [TAGSTRIP]='" & strTagstrip & "' AND [JUMPER_ID] <> '' " &
-                            "GROUP BY [JUMPER_ID])  AS T1"
+                            "GROUP BY [JUMPER_ID]) AS T1"
 
             objDataTable = DBConnection.GetOleDataTable(strSQLQuery, strConstProjectDatabasePath)
 

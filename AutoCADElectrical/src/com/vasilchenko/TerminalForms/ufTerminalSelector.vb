@@ -18,6 +18,9 @@ Public Class ufTerminalSelector
         cbxLocation.DataSource = objLocationList
         cbxOrientation.DataSource = New EnumDescriptorCollection(Of OrientationEnum)
         cbxDuctSide.DataSource = New EnumDescriptorCollection(Of SideEnum)
+        'пока отключаю
+        cbxOrientation.Enabled = False
+        cbxDuctSide.Enabled = False
     End Sub
 
     Private Sub cbxLocation_SelectedValueChanged(sender As Object, e As EventArgs) Handles cbxLocation.SelectedValueChanged
@@ -33,13 +36,13 @@ Public Class ufTerminalSelector
     End Sub
 
     Private Sub cbxTerminal_SelectedValueChanged(sender As Object, e As EventArgs) Handles cbxTerminal.SelectedValueChanged
-        If cbxTerminal.Text <> "" Then
-            cbxOrientation.Enabled = True
-            cbxDuctSide.Enabled = True
-        Else
-            cbxOrientation.Enabled = False
-            cbxDuctSide.Enabled = False
-        End If
+        'If cbxTerminal.Text <> "" Then
+        '    cbxOrientation.Enabled = True
+        '    cbxDuctSide.Enabled = True
+        'Else
+        '    cbxOrientation.Enabled = False
+        '    cbxDuctSide.Enabled = False
+        'End If
     End Sub
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         Me.Close()

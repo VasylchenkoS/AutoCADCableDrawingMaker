@@ -39,28 +39,34 @@
             End Set
         End Property
 
-        Public WriteOnly Property WireLeft As WireClass
+        Public WriteOnly Property AddWireLeft As WireClass
             Set(value As WireClass)
                 objWiresLeft.Add(value)
             End Set
         End Property
 
-        Public WriteOnly Property WireRigth As WireClass
+        Public WriteOnly Property AddWireRigth As WireClass
             Set(value As WireClass)
                 objWiresRigth.Add(value)
             End Set
         End Property
 
-        Public ReadOnly Property WiresLeftList As List(Of WireClass)
+        Public Property WiresLeftList As List(Of WireClass)
             Get
                 Return objWiresLeft
             End Get
+            Set(value As List(Of WireClass))
+                objWiresLeft = value
+            End Set
         End Property
 
-        Public ReadOnly Property WiresRigthList As List(Of WireClass)
+        Public Property WiresRigthList As List(Of WireClass)
             Get
                 Return objWiresRigth
             End Get
+            Set(value As List(Of WireClass))
+                objWiresRigth = value
+            End Set
         End Property
 
         Public Sub New()
@@ -89,6 +95,12 @@
                 Return Me.intTERM.CompareTo(other.TERM)
             End If
         End Function
+
+        Friend Function WireNameStartsWith(strWireName As String) As Boolean
+            Return Me.objWiresLeft.Any(Function(x) x.Wireno.StartsWith(strWireName)) Or
+                Me.objWiresRigth.Any(Function(x) x.Wireno.StartsWith(strWireName))
+        End Function
+
     End Class
 
 End Namespace

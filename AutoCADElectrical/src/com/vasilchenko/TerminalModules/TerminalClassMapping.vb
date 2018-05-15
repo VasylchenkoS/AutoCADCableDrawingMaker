@@ -36,6 +36,7 @@ Namespace com.vasilchenko.TerminalModules
                 ElseIf .rbtnControl.Checked Then
                     AddPhoenixTerminalAccessories.AddPhoenixAccForControl(objTerminalStripList.TerminalList)
                 ElseIf .rbtnPower.Checked Then
+                    AddPhoenixTerminalAccessories.AddPhoenixAccForPower(objTerminalStripList.TerminalList)
                 Else
                     Exit Sub
                 End If
@@ -120,13 +121,7 @@ Namespace com.vasilchenko.TerminalModules
             DBDataAccessObject.FillTerminalBlockPath(objResultArray)
             DBDataAccessObject.FillTerminalConnectionsData(objResultArray, eDucktSide)
 
-            'For Each objTempItem As TerminalClass In objResultArray
-            '    DBDataAccessObject.FillTerminalBlockPath(objTempItem)
-            '    DBDataAccessObject.FillTerminalConnectionsData(objTempItem, eDucktSide)
-            'Next
-
             Return objResultArray
-
         End Function
 
     End Module

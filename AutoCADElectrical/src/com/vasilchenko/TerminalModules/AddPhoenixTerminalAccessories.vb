@@ -4,7 +4,7 @@ Imports AutoCADElectrical.com.vasilchenko.DBAccessConnection
 
 Namespace com.vasilchenko.TerminalModules
     Module AddPhoenixTerminalAccessories
-        Public Sub AddPhoenixAccForSignalisation(objMappingTermsList As List(Of TerminalAccessoriesClass))
+        Friend Sub AddPhoenixAccForSignalisation(objMappingTermsList As List(Of TerminalAccessoriesClass))
             If objMappingTermsList.Count = 0 Then Exit Sub
             Dim objCurTerminal As TerminalClass = Nothing
             Dim intCount As Integer = objMappingTermsList.Count - 2
@@ -33,6 +33,52 @@ Namespace com.vasilchenko.TerminalModules
                     End If
                 End If
                 index += 1
+            Loop
+            objMappingTermsList.Add(GetCoverObject(objCurTerminal))
+            objMappingTermsList.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))
+        End Sub
+
+        Friend Sub AddPhoenixAccForPower(objMappingTermsList As List(Of TerminalAccessoriesClass))
+            If objMappingTermsList.Count = 0 Then Exit Sub
+            Dim objCurTerminal As TerminalClass = Nothing
+            Dim objPrevTerminal As TerminalClass = Nothing
+            Dim intCount As Integer = objMappingTermsList.Count
+            Dim index As Integer = 0
+
+            Do While index <> intCount
+                objCurTerminal = objMappingTermsList.Item(index)
+                If objCurTerminal.TERM = 16 Then
+                    Debug.Print("")
+                End If
+                If objCurTerminal.TERM = 1 Then
+                    objMappingTermsList.Insert(index, EnumFunctions.Convert(AccessoriesPhoenixContactEnum.TerminalMarker, objCurTerminal))
+                    objMappingTermsList.Insert(index + 1, GetPlateObject(objCurTerminal))
+                    index += 2
+                    intCount += 2
+                ElseIf (objCurTerminal.TERM = 2 Or objCurTerminal.TERM = 4) And objCurTerminal.CAT = "UT6-HESI(6,3X32)" Then
+                    objMappingTermsList.Insert(index + 1, GetPlateObject(objCurTerminal))
+                    index += 1
+                    intCount += 1
+                ElseIf objCurTerminal.CAT <> "UT6-HESI(6,3X32)" Then
+                    If ((objPrevTerminal.WireNameStartsWith("PL") Or objPrevTerminal.WireNameStartsWith("PP")) And
+                        (objCurTerminal.WireNameStartsWith("PN") Or objCurTerminal.WireNameStartsWith("PM"))) OrElse
+                        (objCurTerminal.WireNameStartsWith("PE") And objPrevTerminal.WireNameStartsWith("PM")) Then
+                        objMappingTermsList.Insert(index, GetCoverObject(objCurTerminal))
+                        index += 1
+                        intCount += 1
+                    ElseIf (objPrevTerminal.WireNameStartsWith("PN") Or objPrevTerminal.WireNameStartsWith("PM")) And
+                        (objCurTerminal.WireNameStartsWith("PL") Or objCurTerminal.WireNameStartsWith("PP")) Then
+                        objMappingTermsList.Insert(index, GetPlateObject(objCurTerminal))
+                        index += 1
+                        intCount += 1
+                    End If
+                End If
+                index += 1
+
+                If objCurTerminal.WiresLeftList.Count <> 0 OrElse objCurTerminal.WiresRigthList.Count <> 0 Then
+                    objPrevTerminal = objCurTerminal
+                End If
+
             Loop
             objMappingTermsList.Add(GetCoverObject(objCurTerminal))
             objMappingTermsList.Add(EnumFunctions.Convert(AccessoriesPhoenixContactEnum.EndClamp35, objCurTerminal))

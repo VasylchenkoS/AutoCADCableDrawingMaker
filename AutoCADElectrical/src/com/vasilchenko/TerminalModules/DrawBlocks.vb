@@ -22,6 +22,7 @@ Namespace com.vasilchenko.TerminalModules
                 acInsObjectID = acDatabase.Insert(strBlkName, acNewDbDwg, True)
                 acNewDbDwg.Dispose()
             End If
+
             Using acBlkRef As New BlockReference(acInsertPt, acInsObjectID)
                 acBlkRef.Layer = "PSYMS"
                 acBlkRef.ScaleFactors = New Scale3d(dblScale)
@@ -102,13 +103,13 @@ Namespace com.vasilchenko.TerminalModules
                         acBlkRef.AttributeCollection.AppendAttribute(acAttrbReference)
                         acTransaction.AddNewlyCreatedDBObject(acAttrbReference, True)
 
-                        If dblRotation = 180 Then
-                            Dim acPtFrom As Point3d = acInsertPt
-                            Dim acPtTo As Point3d = New Point3d(acInsertPt.X, acInsertPt.Y - 5, acInsertPt.Z)
-                            Dim acLine3d As Line3d = New Line3d(acPtFrom, acPtTo)
-                            acBlkRef.TransformBy(Matrix3d.Mirroring(acLine3d))
-                            acAttrbReference.TransformBy(Matrix3d.Mirroring(acLine3d))
-                        End If
+                        'If dblRotation = 180 Then
+                        '    Dim acPtFrom As Point3d = acInsertPt
+                        '    Dim acPtTo As Point3d = New Point3d(acInsertPt.X, acInsertPt.Y - 5, acInsertPt.Z)
+                        '    Dim acLine3d As Line3d = New Line3d(acPtFrom, acPtTo)
+                        '    acBlkRef.TransformBy(Matrix3d.Mirroring(acLine3d))
+                        '    acAttrbReference.TransformBy(Matrix3d.Mirroring(acLine3d))
+                        'End If
 
                     End If
                 Next
@@ -210,7 +211,6 @@ Namespace com.vasilchenko.TerminalModules
             End If
         End Sub
 
-        'Проработать прорисовку перемычек
         Public Sub DrawJumpers(acDatabase As Database, acTransaction As Transaction,
                                objInputJumper As JumperClass, acInsertPt As Point3d, dblScale As Double)
 
