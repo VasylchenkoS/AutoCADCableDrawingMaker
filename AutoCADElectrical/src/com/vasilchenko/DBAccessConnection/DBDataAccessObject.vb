@@ -2,23 +2,17 @@
 Imports AutoCADElectrical.com.vasilchenko.TerminalClasses
 Imports AutoCADElectrical.com.vasilchenko.TerminalEnums
 Imports Autodesk.AutoCAD.EditorInput
+Imports Autodesk.Electrical.Project
 
 Namespace com.vasilchenko.DBAccessConnection
     Module DBDataAccessObject
         'Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
         'Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
-        Private strConstProjectDatabasePath As String
         Public Function GetAllLocations() As ArrayList
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
             Dim objLocationList As New ArrayList
-
-            If strConstProjectDatabasePath = "" Then
-                strConstProjectDatabasePath = FillProjectDataPath()
-            ElseIf Right(strConstProjectDatabasePath, Len(strConstProjectDatabasePath) - InStrRev(strConstProjectDatabasePath, "\",, CompareMethod.Text)) <>
-                    Right(Application.AcadApplication.ActiveDocument.Path, Len(Application.AcadApplication.ActiveDocument.Path) - InStrRev(Application.AcadApplication.ActiveDocument.Path, "\",, CompareMethod.Text)) & ".mdb" Then
-                strConstProjectDatabasePath = FillProjectDataPath()
-            End If
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             If Not IO.File.Exists(strConstProjectDatabasePath) Then
                 MsgBox("Source file not found. File way: " & strConstProjectDatabasePath & " Please open some project file and repeat.", vbCritical, "File Not Found")
@@ -40,15 +34,12 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objLocationList
         End Function
-        Private Function FillProjectDataPath() As String
-            Dim strCustomIconPath As String = Left(Application.AcadApplication.Preferences.Files.ToolPalettePath, InStrRev(Application.AcadApplication.Preferences.Files.ToolPalettePath, "\",, CompareMethod.Text))
-            Dim strProjectName As String = Right(Application.AcadApplication.ActiveDocument.Path, Len(Application.AcadApplication.ActiveDocument.Path) - InStrRev(Application.AcadApplication.ActiveDocument.Path, "\",, CompareMethod.Text))
-            FillProjectDataPath = strCustomIconPath & "User\" & UCase(strProjectName) & ".mdb"
-        End Function
+
         Public Function GetAllTagstripInLocation(strLocation As String) As ArrayList
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
             Dim objLocationList As New ArrayList
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             strSQLQuery = "SELECT DISTINCT [TAGSTRIP] " &
                             "FROM TERMS " &
@@ -69,6 +60,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
             Dim objLocationList As New List(Of String)
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             strSQLQuery = "SELECT DISTINCT [TERM] " &
                             "FROM TERMS " &
@@ -89,6 +81,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
             Dim objResultTerminal As New TerminalClass
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             objResultTerminal.P_TAGSTRIP = strTagstrip
             objResultTerminal.TERM = strTermValue
@@ -132,6 +125,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objDataTable As DataTable
             Dim strSQLQuery As String
             Dim acEditor As Editor = Application.DocumentManager.MdiActiveDocument.Editor
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             For Each objInputTerminal As TerminalClass In objInputList
 
@@ -316,6 +310,7 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objResultJumper As JumperClass
             Dim objAccJumper As TerminalAccessoriesClass
             Dim objJumperList As New List(Of JumperClass)
+            Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             strSQLQuery = "SELECT V1 AS [TERM], V3 AS [CAT], V4 AS [MFG], V5 AS [INST], V6 AS [LOC] " &
                             "FROM " &

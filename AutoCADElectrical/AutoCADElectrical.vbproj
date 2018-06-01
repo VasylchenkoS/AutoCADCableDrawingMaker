@@ -99,6 +99,9 @@
       <Private>False</Private>
       <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\acdbmgd.dll</HintPath>
     </Reference>
+    <Reference Include="AcePageManMgd">
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\Acade\AcePageManMgd.dll</HintPath>
+    </Reference>
     <Reference Include="AcMgd">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
