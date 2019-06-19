@@ -12,31 +12,32 @@ Namespace com.vasilchenko.TerminalModules
         Public Sub CreateTerminalBlock(strLocation As String, strTagstrip As String,
                                     eOrientation As OrientationEnum, eDucktSide As SideEnum)
 
-            Dim objTermsList As List(Of String)
-            Dim dblScale As Double = 0.6
-            Dim dblRotation As Double
+            Const dblScale As Double = 1
+            Const dblRotation As Double = 0
             Dim objTerminalStripList As New TerminalStripClass
 
-            objTermsList = DBDataAccessObject.GetAllTermsInLocation(strLocation, strTagstrip)
-            objTerminalStripList.TerminalList = FillTerminalData(objTermsList, strTagstrip, eDucktSide)
+            Dim objTermsList As List(Of Short) = DataAccessObject.GetAllTermsInLocation(strLocation, strTagstrip)
+            objTerminalStripList.TerminalList = FillTerminalData(objTermsList, strTagstrip, eDucktSide, strLocation)
 
             objTerminalStripList.TerminalList.Sort(Function(x As TerminalClass, y As TerminalClass)
-                                                       Return x.TERM.CompareTo(y.TERM)
+                                                       Return x.MainTermNumber.CompareTo(y.MainTermNumber)
                                                    End Function)
 
-            AddPhoenixJumpers.FillStripByJumpers(objTerminalStripList)
+            AddJumpers.FillStripByJumpers(objTerminalStripList)
 
-            Dim ufTTS As New ufTerminalTypeSelector
-            With ufTTS
-                ufTTS.ShowDialog()
+            Dim ufTerminalTypeSelector As New ufTerminalTypeSelector
+            With ufTerminalTypeSelector
+                ufTerminalTypeSelector.ShowDialog()
                 If .rbtnSignalisation.Checked Then
-                    AddPhoenixTerminalAccessories.AddPhoenixAccForSignalisation(objTerminalStripList.TerminalList)
+                    AddTerminalAccessories.AddAccessoriesForSignalisation(objTerminalStripList.TerminalList)
                 ElseIf .rbtnMeasurement.Checked Then
-                    AddPhoenixTerminalAccessories.AddPhoenixAccForMeasurement(objTerminalStripList.TerminalList)
+                    AddTerminalAccessories.AddAccessoriesForMeasurement(objTerminalStripList.TerminalList)
                 ElseIf .rbtnControl.Checked Then
-                    AddPhoenixTerminalAccessories.AddPhoenixAccForControl(objTerminalStripList.TerminalList)
+                    AddTerminalAccessories.AddAccessoriesForControl(objTerminalStripList.TerminalList)
                 ElseIf .rbtnPower.Checked Then
-                    AddPhoenixTerminalAccessories.AddPhoenixAccForPower(objTerminalStripList.TerminalList)
+                    AddTerminalAccessories.AddAccessoriesForPower(objTerminalStripList.TerminalList)
+                ElseIf .rbtnMetering.Checked Then
+                    AddTerminalAccessories.AddAccessoriesForMetering(objTerminalStripList.TerminalList)
                 Else
                     Exit Sub
                 End If
@@ -56,72 +57,99 @@ Namespace com.vasilchenko.TerminalModules
 
             Dim objJumper As JumperClass
 
-            'Добавить логику прорисовки джамперов!
             Dim acDatabase As Database = HostApplicationServices.WorkingDatabase()
-            Dim acTransaction As Transaction = acDatabase.TransactionManager.StartTransaction
-            Try
-                For Each objCurItem As Object In objTerminalStripList.TerminalList
-                    If TypeOf (objCurItem) Is TerminalClass Then
-                        If objCurItem.CAT = "UT-2,5-MT" And eDucktSide = SideEnum.Left Then
-                            dblRotation = 180.0
-                        Else dblRotation = 0.0
+            Using acTransaction As Transaction = acDatabase.TransactionManager.StartTransaction
+                For Each objCurItem As TerminalClass In objTerminalStripList.TerminalList
+                    If not objCurItem Is nothing Then 
+                        If objCurItem.MainTermNumber <> 0
+                            DrawBlocks.DrawTerminalBlock(acDatabase, acTransaction, objCurItem, acInsertPt, dblScale, dblRotation)
+
+                            objJumper = objTerminalStripList.JumperList.Find(Function(x) x.StartTermNum = objCurItem.BottomLevelTerminal.TerminalNumber)
+                            If objJumper IsNot Nothing Then
+                                Dim acJumperInsertPt As Point3d = CalculateJumperInsertPoint(dblScale, acInsertPt, objJumper, objCurItem)
+                                DrawBlocks.DrawJumpers(acDatabase, acTransaction, objJumper, acJumperInsertPt, dblScale)
+                            End If
+                        Else
+                            DrawBlocks.DrawAccesoriesBlock(acDatabase, acTransaction, objCurItem, acInsertPt, dblScale)
                         End If
-                        DrawBlocks.DrawTerminalBlock(acDatabase, acTransaction, objCurItem, acInsertPt, dblScale, dblRotation)
-                        objJumper = objTerminalStripList.JumperList.Find(Function(x) x.StartTermNum = objCurItem.TERM)
-                        If objJumper IsNot Nothing Then
-                            Dim acJumperInsertPt As Point3d = CalculateJumperInsertPoint(dblScale, acInsertPt, objJumper, objCurItem, dblRotation)
-                            DrawBlocks.DrawJumpers(acDatabase, acTransaction, objJumper, acJumperInsertPt, dblScale)
-                        End If
-                    ElseIf TypeOf (objCurItem) Is TerminalAccessoriesClass Then
-                        DrawBlocks.DrawAccesoriesBlock(acDatabase, acTransaction, objCurItem, acInsertPt, dblScale)
-                    End If
-                    acInsertPt = New Point3d(acInsertPt.X, acInsertPt.Y - (objCurItem.HEIGHT * dblScale), acInsertPt.Z)
+                    acInsertPt = New Point3d(acInsertPt.X, acInsertPt.Y - (objCurItem.Height * dblScale), acInsertPt.Z)
+                    end if 
                 Next
                 acTransaction.Commit()
-            Catch
-                MsgBox(Err.Description)
-            Finally
-                acTransaction.Dispose()
-            End Try
-
+            End Using
         End Sub
 
-        Private Function CalculateJumperInsertPoint(dblScale As Double, acInsertPt As Point3d, objJumper As JumperClass, objCurItem As Object, dblRotation As Double) As Point3d
+        Private Function FillTerminalData(objInputList As IReadOnlyCollection(Of Short), strTagstrip As String, eDucktSide As SideEnum, strLocation As string) As List(Of TerminalClass)
+            Dim objResultArray As List(Of TerminalClass)
+            objResultArray = (From shtTermNum In objInputList
+                              Select DataAccessObject.FillTermTypeData(strTagstrip, shtTermNum, strLocation)
+                ).Cast(Of TerminalClass)().ToList()
+            DataAccessObject.FillTerminalBlockPath(objResultArray)
+            DataAccessObject.FillTerminalConnectionsData(objResultArray, eDucktSide)
+            UnionTerminals(objResultArray)
+
+            Return objResultArray
+        End Function
+
+        Private Sub UnionTerminals(ByRef objInputArray As List(Of TerminalClass))
+            Dim objResultArray As List(Of TerminalClass)
+            Dim objTopTermList = objInputArray.FindAll(Function(x) Not IsNothing(x.TopLevelTerminal)).ToList()
+            If objTopTermList.Count <> 0 Then
+                objResultArray = objInputArray.FindAll(Function(x) IsNothing(x.TopLevelTerminal)).ToList()
+                For Each curTerminal As TerminalClass In objResultArray
+                    curTerminal.TopLevelTerminal = objTopTermList.Find(Function(y)
+                                                                           Return y.MainTermNumber = curTerminal.MainTermNumber
+                                                                       End Function).TopLevelTerminal
+                Next
+                objInputArray = objResultArray
+            End If
+        End Sub
+
+        Private Function CalculateJumperInsertPoint(dblScale As Double, acInsertPt As Point3d, objJumper As JumperClass, objCurItem As TerminalClass) As Point3d
             Dim acJumperInsertPt As Point3d
-            If objCurItem.CAT = "UT-2,5" Then
+            If objCurItem.Catalog.StartsWith("UT ") And Not (objCurItem.Catalog.Contains("-")) OrElse objCurItem.Catalog = "UT 2,5-PE" Then
                 If objJumper.Side = SideEnum.Left Then
-                    acJumperInsertPt = New Point3d(acInsertPt.X - (2.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
+                    acJumperInsertPt = New Point3d(acInsertPt.X - (2.5 * dblScale), acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
                 Else
-                    acJumperInsertPt = New Point3d(acInsertPt.X + (2.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
+                    acJumperInsertPt = New Point3d(acInsertPt.X + (2.5 * dblScale), acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
                 End If
-            ElseIf objCurItem.CAT = "UT-2,5-MT" Then
-                If dblRotation = 0.0 Then
-                    If objJumper.Side = SideEnum.Left Then
-                        acJumperInsertPt = New Point3d(acInsertPt.X + (2.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
-                    Else
-                        acJumperInsertPt = New Point3d(acInsertPt.X + (7.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
-                    End If
+            ElseIf objCurItem.Catalog.Equals("UT 2,5-MT") Or objCurItem.Catalog.Equals("UT 4-MT")  Or objCurItem.Catalog.Equals("UT 4-MTD-DIO/R-L")Then
+                'If dblRotation = 0 Then
+                If objJumper.Side = SideEnum.Left Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X + (2.5 * dblScale), acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
                 Else
-                    If objJumper.Side = SideEnum.Left Then
-                        acJumperInsertPt = New Point3d(acInsertPt.X - (7.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
-                    Else
-                        acJumperInsertPt = New Point3d(acInsertPt.X - (2.5 * dblScale), acInsertPt.Y - ((objCurItem.HEIGHT / 2) * dblScale), acInsertPt.Z)
-                    End If
+                    acJumperInsertPt = New Point3d(acInsertPt.X + (7.5 * dblScale), acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+                End If
+            ElseIf objCurItem.Catalog = "UTTB 2,5-MT-P/P" Then
+                If objJumper.Side = SideEnum.Left Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X + 15, acInsertPt.Y - (6.425 * dblScale), acInsertPt.Z)
+                Else
+                    acJumperInsertPt = New Point3d(acInsertPt.X + 20, acInsertPt.Y - (6.425 * dblScale), acInsertPt.Z)
+                End If
+            ElseIf objCurItem.Catalog = "URTK 6" Then
+                If objJumper.Jumper.Catalog.StartsWith("SB") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X - 25, acInsertPt.Y - (4.075 * dblScale), acInsertPt.Z)
+                ElseIf objJumper.Jumper.Catalog.StartsWith("FBRI") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X + 15, acInsertPt.Y - (4.075 * dblScale), acInsertPt.Z)
+                End If
+            ElseIf objCurItem.Catalog.StartsWith("AVK 2,5 R")Then
+                If objJumper.Side = SideEnum.Left Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X - 10, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+                Else
+                    acJumperInsertPt = New Point3d(acInsertPt.X - 5, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+                End If
+            ElseIf objCurItem.Catalog.StartsWith ("AVK 4 A") or objCurItem.Catalog.StartsWith ("AVK 2,5 A") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X + 10, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+            ElseIf objCurItem.Catalog.StartsWith ("AVK 6") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+            ElseIf objCurItem.Catalog.StartsWith("WGO 4") Then
+                If objJumper.Jumper.Catalog.StartsWith("UK") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X + 15, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
+                ElseIf objJumper.Jumper.Catalog.StartsWith("IZUK") Then
+                    acJumperInsertPt = New Point3d(acInsertPt.X - 25, acInsertPt.Y - ((objCurItem.Height / 2) * dblScale), acInsertPt.Z)
                 End If
             End If
             Return acJumperInsertPt
-        End Function
-
-        Private Function FillTerminalData(objInputList As List(Of String), strTagstrip As String, eDucktSide As SideEnum) As List(Of TerminalAccessoriesClass)
-            Dim objResultArray As New List(Of TerminalAccessoriesClass)
-
-            For Each strTempItem As String In objInputList
-                objResultArray.Add(DBDataAccessObject.FillTermTypeData(strTagstrip, strTempItem))
-            Next
-            DBDataAccessObject.FillTerminalBlockPath(objResultArray)
-            DBDataAccessObject.FillTerminalConnectionsData(objResultArray, eDucktSide)
-
-            Return objResultArray
         End Function
 
     End Module

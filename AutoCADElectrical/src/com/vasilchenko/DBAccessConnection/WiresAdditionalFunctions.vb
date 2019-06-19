@@ -15,10 +15,8 @@ Namespace com.vasilchenko.DBAccessConnection
                     For j As Short = i + 1 To 0 Step -1
                         objTempWireJ = objConnectionList.Item(j)
 
-                        If objTempWireI.Instance = objTempWireJ.Instance AndAlso Not objTempWireI.TERMDESC.Equals(objTempWireJ.TERMDESC) AndAlso GetNumericFromString(objTempWireI.Name) <> -1 Then
-                            'If Replace(objTempWireI.Name, GetNumericFromString(objTempWireI.Name), "") =
-                            '        Replace(objTempWireJ.Name, GetNumericFromString(objTempWireJ.Name), "") Then
-                            If objTempWireI.Name.Length > 3 AndAlso objTempWireJ.Name.Length > 3 AndAlso objTempWireI.Name.Remove(3) = objTempWireJ.Name.Remove(3) Then
+                        If objTempWireI.Instance = objTempWireJ.Instance AndAlso Not objTempWireI.Termdesc.Equals(objTempWireJ.Termdesc) AndAlso GetNumericFromString(objTempWireI.ConnTag) <> -1 Then
+                            If objTempWireI.ConnTag.Length > 3 AndAlso objTempWireJ.ConnTag.Length > 3 AndAlso objTempWireI.ConnTag.Remove(3) = objTempWireJ.ConnTag.Remove(3) Then
                                 objConnectionList.RemoveAt(i)
                             End If
                         End If
@@ -27,12 +25,12 @@ Namespace com.vasilchenko.DBAccessConnection
                 Next
             Next
         End Sub
-        Private Function GetNumericFromString(s As String) As String
+        Private Function GetNumericFromString(s As String) As Double
             If IsNothing(s) Then Return -1
             Dim rgx As New Regex("-?\d*\.?\d+", RegexOptions.IgnoreCase)
             Dim matches As MatchCollection = rgx.Matches(s)
             If matches.Count > 0 Then
-                Return matches(matches.Count - 1).Value
+                Return Math.Abs(Double.Parse(matches(matches.Count - 1).Value))
             Else
                 Return -1
             End If
@@ -41,23 +39,35 @@ Namespace com.vasilchenko.DBAccessConnection
         Public Sub SortCollectionByInstAndCables(ByRef objInputDictionary As TerminalDictionaryClass(Of String, List(Of WireClass)))
 
             Dim objTempWire As WireClass
+            Dim shtFalse As Short = 0
 
             For Each objConnectionList As List(Of WireClass) In objInputDictionary.Items
-                For intY As Short = 0 To objConnectionList.Count - 2
-                    If GetNumericFromString(objConnectionList.Item(intY).Instance) > GetNumericFromString(objConnectionList.Item(intY + 1).Instance) Then
-                        objTempWire = objConnectionList(intY)
-                        objConnectionList.RemoveAt(intY)
-                        objConnectionList.Insert(intY + 1, objTempWire)
-                    ElseIf objConnectionList.Item(intY).HasCable Then
-                        objTempWire = objConnectionList(intY)
-                        objConnectionList.RemoveAt(intY)
-                        objConnectionList.Insert(intY + 1, objTempWire)
-                    ElseIf objConnectionList.Item(intY + 1).HasCable And (intY + 2) < objConnectionList.Count Then
-                        objTempWire = objConnectionList(intY + 1)
-                        objConnectionList.RemoveAt(intY + 1)
-                        objConnectionList.Insert(intY + 2, objTempWire)
-                    End If
-                Next
+                If Not objConnectionList.Count = 1 Then
+                    For intY As Short = 0 To objConnectionList.Count - 2
+                        If GetNumericFromString(objConnectionList.Item(intY).Instance) = -1 OrElse
+                            (GetNumericFromString(objConnectionList.Item(intY).Instance) > GetNumericFromString(objConnectionList.Item(intY + 1).Instance) And GetNumericFromString(objConnectionList.Item(intY + 1).Instance) <> -1) Then
+                            objTempWire = objConnectionList(intY)
+                            objConnectionList.RemoveAt(intY)
+                            objConnectionList.Insert(intY + 1, objTempWire)
+                            intY = -1
+                        ElseIf objConnectionList.Item(intY).HasCable Then
+                            objTempWire = objConnectionList(intY)
+                            objConnectionList.RemoveAt(intY)
+                            objConnectionList.Insert(intY + 1, objTempWire)
+                            intY = -1
+                        ElseIf objConnectionList.Item(intY + 1).HasCable And (intY + 2) < objConnectionList.Count Then
+                            objTempWire = objConnectionList(intY + 1)
+                            objConnectionList.RemoveAt(intY + 1)
+                            objConnectionList.Insert(intY + 2, objTempWire)
+                            intY = -1
+                        End If
+                        shtFalse += 1
+                        If shtFalse = 20 Then
+                            MsgBox("В клемме ошибка. Измените подключение " & objConnectionList.Item(intY + 1).Termdesc & ":" & objConnectionList.Item(intY + 1).WireNumber)
+                            Exit Sub
+                        End If
+                    Next
+                End If
             Next
         End Sub
 
@@ -65,33 +75,28 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim objConnectionListF As List(Of WireClass)
             Dim objConnectionListS As List(Of WireClass)
             Dim objTempList As List(Of WireClass)
+            Dim blnChange = False
 
-            Dim blnKF, blnKS, blnCF, blnCS As Boolean
 
             For lngA As Short = 0 To objInputDictionary.Count - 2
-                blnKF = False : blnKS = False : blnCF = False : blnCS = False
                 objConnectionListF = objInputDictionary.Item(lngA)
                 objConnectionListS = objInputDictionary.Item(lngA + 1)
-                For lngI = 1 To objConnectionListF.Count - 1
-                    If objConnectionListF.Item(lngI).HasCable Then
-                        If objConnectionListF.Item(lngI).Cable.Destination <> strPanelLocation Then
-                            blnKF = True
-                        Else : blnCF = True
-                        End If
-                    End If
-                Next
-                For lngI As Short = 1 To objConnectionListS.Count - 1
-                    If objConnectionListS.Item(lngI).HasCable Then
-                        If objConnectionListS.Item(lngI).Cable.Destination <> strPanelLocation Then
-                            blnKS = True
-                        Else : blnCS = True
-                        End If
-                    End If
-                Next
-                If blnKF And Not blnKS Or blnCF And Not blnCS Then
+                If objConnectionListF.Min(Function(x) GetNumericFromString(x.Instance)) = -1 OrElse
+                    objConnectionListF.Min(Function(x) GetNumericFromString(x.Instance)) > objConnectionListS.Min(Function(x) GetNumericFromString(x.Instance)) Then
+                    blnChange = True
+                End If
+                If objConnectionListF.Any(Function(x)
+                                              If x.HasCable AndAlso (x.Cable.Destination <> "" And x.Cable.Destination <> strPanelLocation) Then
+                                                  Return True
+                                              Else : Return False
+                                              End If
+                                          End Function) Then
+                    blnChange = True
+                End If
+                If blnChange Then
                     objTempList = objInputDictionary.Item(lngA)
                     objInputDictionary.RemoveAt(lngA)
-                    objInputDictionary.Add(key:=objTempList.Item(0).Wireno, value:=objTempList)
+                    objInputDictionary.Add(key:=objTempList.Item(0).WireNumber, value:=objTempList)
                 End If
             Next
         End Sub

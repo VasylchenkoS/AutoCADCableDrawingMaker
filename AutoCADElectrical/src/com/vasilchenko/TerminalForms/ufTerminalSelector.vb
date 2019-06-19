@@ -5,7 +5,7 @@ Imports AutoCADElectrical.com.vasilchenko.TerminalModules
 Public Class ufTerminalSelector
 
     Private Sub ufTerminalSelector_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim objLocationList As ArrayList = DBDataAccessObject.GetAllLocations()
+        Dim objLocationList As ArrayList = DataAccessObject.GetAllLocations()
 
         cbxTerminal.Enabled = False
         cbxOrientation.Enabled = False
@@ -29,7 +29,7 @@ Public Class ufTerminalSelector
         cbxDuctSide.Enabled = False
 
         If cbxLocation.Text <> "" Then
-            cbxTerminal.DataSource = DBDataAccessObject.GetAllTagstripInLocation(cbxLocation.Text)
+            cbxTerminal.DataSource = DataAccessObject.GetAllTagstripInLocation(cbxLocation.Text)
             cbxTerminal.Enabled = True
         Else : cbxTerminal.Enabled = False
         End If

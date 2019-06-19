@@ -1,8 +1,8 @@
 ﻿Namespace com.vasilchenko.TerminalClasses
     Public Class TerminalDictionaryClass(Of TKey, TValue)
         Private _count As Integer
-        Private _keys As New List(Of TKey)
-        Private _values As New List(Of TValue)
+        Private ReadOnly _keys As New List(Of TKey)
+        Private ReadOnly _values As New List(Of TValue)
         Public ReadOnly Property Count As Integer
             Get
                 Return _keys.Count

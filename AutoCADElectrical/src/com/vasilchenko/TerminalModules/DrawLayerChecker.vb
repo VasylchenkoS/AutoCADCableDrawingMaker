@@ -5,59 +5,81 @@ Imports Autodesk.AutoCAD.DatabaseServices
 Namespace com.vasilchenko.TerminalModules
     Module DrawLayerChecker
         Public Sub CheckLayers()
-            Dim acadDocument As Document = Core.Application.DocumentManager.MdiActiveDocument
-            Dim acadCurDB As Database = acadDocument.Database
+            Dim acDocument As Document = Core.Application.DocumentManager.MdiActiveDocument
+            Dim acDatabase As Database = acDocument.Database
             Dim objLayerList As New List(Of String) _
-                ({"PASSY", "PCAT", "PDESC", "PGRP", "PITEM", "PLOC", "PMFG", "PMISC", "PMNT", "PRTG", "PSYMS", "PTAG", "PTERM", "PWIRE"})
+                ({"PASSY", "PCAT", "PDESC", "PGRP", "PITEM", "PLOC", "PMFG", "PMISC", "PMNT", "PRTG", "PSYMS", "PTAG", "PTERM", "PWIRE", "LINK", "JUMPER", "Cable", "_MULTI_WIRE", "Монтажные отверстия", "Оси"})
 
-            Using acadTransanction As Transaction = acadCurDB.TransactionManager.StartTransaction()
-                Dim acadLayerTbl As LayerTable
-                acadLayerTbl = acadTransanction.GetObject(acadCurDB.LayerTableId, OpenMode.ForRead)
+            Using acTransanction As Transaction = acDatabase.TransactionManager.StartTransaction()
+                Dim acLayerTbl = CType(acTransanction.GetObject(acDatabase.LayerTableId, OpenMode.ForRead), LayerTable)
 
-                For Each sLayerName As String In objLayerList
-                    If acadLayerTbl.Has(sLayerName) = False Then
-                        Using acadLayerTblRec As LayerTableRecord = New LayerTableRecord()
-                            acadLayerTblRec.Name = sLayerName
-                            Select Case sLayerName
+                For Each strLayerName As String In objLayerList
+                    If acLayerTbl.Has(strLayerName) = False Then
+                        Using acLayerTblRec As LayerTableRecord = New LayerTableRecord()
+                            acLayerTblRec.Name = strLayerName
+                            Select Case strLayerName
                                 Case "PASSY"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 134)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 134)
                                 Case "PCAT"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 9)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 9)
                                 Case "PDESC"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 1)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 7)
                                 Case "PGRP"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
                                 Case "PITEM"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 20)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 20)
                                 Case "PLOC"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
                                 Case "PMFG"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 9)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 9)
                                 Case "PMISC"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 2)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 2)
                                 Case "PMNT"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 8)
                                 Case "PRTG"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 130)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 130)
                                 Case "PSYMS"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 7)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 7)
                                 Case "PTAG"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 51)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 51)
                                 Case "PTERM"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 6)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 6)
                                 Case "PWIRE"
-                                    acadLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 84)
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 6)
+                                Case "PTERM"
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 7)
+                                Case "Cable"
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 3)
+                                    acLayerTblRec.LineWeight = LineWeight.LineWeight030
+                                Case "Монтажные отверстия"
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 1)
+                                    acLayerTblRec.LineWeight = LineWeight.LineWeight050
+                                Case "Оси"
+                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 1)
+                                    acLayerTblRec.LineWeight = LineWeight.LineWeight005
                             End Select
 
-                            acadLayerTbl.UpgradeOpen()
-                            acadLayerTbl.Add(acadLayerTblRec)
+                            acLayerTbl.UpgradeOpen()
+                            acLayerTbl.Add(acLayerTblRec)
 
-                            acadTransanction.AddNewlyCreatedDBObject(acadLayerTblRec, True)
+                            acTransanction.AddNewlyCreatedDBObject(acLayerTblRec, True)
                         End Using
+                    Else
+                        Dim acCurLayer As LayerTableRecord = acTransanction.GetObject(acLayerTbl.Item(strLayerName), OpenMode.ForWrite)
+                        acLayerTbl.UpgradeOpen()
+                        Select Case strLayerName
+                            Case "_MULTI_WIRE"
+                                acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 3)
+                                acCurLayer.LineWeight = LineWeight.LineWeight030
+                            Case "LINK"
+                                acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 11)
+                            Case "JUMPER"
+                                acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 3)
+                                acCurLayer.LineWeight = LineWeight.LineWeight005
+                        End Select
                     End If
                 Next
-
-                acadTransanction.Commit()
+                acTransanction.Commit()
             End Using
         End Sub
     End Module

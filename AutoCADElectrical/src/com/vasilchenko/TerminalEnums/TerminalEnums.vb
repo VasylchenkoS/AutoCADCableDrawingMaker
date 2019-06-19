@@ -1,19 +1,24 @@
 ﻿Imports System.ComponentModel
 
 Namespace com.vasilchenko.TerminalEnums
-    Public Enum AccessoriesPhoenixContactEnum
-        <Description("ATP-URTK/SP")> PartitionPlateForUT6
-        <Description("ATP-UT")> PartitionPlateForUT2_5
-        <Description("ATP-UT TWIN")> PartitionPlateForUT2_5MT
-        <Description("CLIPFIX 35")> EndClamp35
-        <Description("CLIPFIX 35-5")> EndClamp35_5
-        <Description("D-UT 2,5/10")> EndCoverForUT2_5
-        <Description("D-UT 2,5/4-TWIN")> EndCoverForUT2_5MT
-        <Description("UBE/D")> TerminalMarker
-        <Description("FBS 2-5")> Jumper2
-        <Description("FBS 3-5")> Jumper3
-        <Description("FBS 4-5")> Jumper4
-        <Description("FBS 10-5")> Jumper10
+
+    Public Enum TerminaAccessoriesEnum
+        'Phoenix Contact
+        <Description("ATP-URTK/SP")> PC_PartitionPlateForUT6
+        <Description("ATP-UT")> PC_PartitionPlateForUT2_5
+        <Description("ATP-UT TWIN")> PC_PartitionPlateForUT2_5MT
+        <Description("CLIPFIX 35")> PC_EndClamp35
+        <Description("DP-UTTB 2,5/4")> PC_PartitionPlateForUTTB2_5
+        <Description("D-UT 2,5/10")> PC_EndCoverForUT2_5
+        <Description("D-UT 2,5/4-TWIN")> PC_EndCoverForUT2_5MT
+        <Description("D-UTTB 2,5/4")> PC_EndCoverForUTTB2_5
+        <Description("D-URTK 6")> PC_EndCoverForURTK_6
+        <Description("UBE/D")> PC_TerminalMarker
+        'KLESMAN
+        <Description("KD 4 Gray")> K_EndClamp
+        <Description("NPP/AVK 2,5-10")> K_EndCoverForForAVK2_5_10
+        <Description("NPP/AVK 4R-A")> K_EndCoverForAVK2_5_R_AVK_4_A
+        <Description("GE Gray")> K_TerminalMarker
     End Enum
 
     Public Enum OrientationEnum
@@ -25,5 +30,5 @@ Namespace com.vasilchenko.TerminalEnums
         <Description("Справа")> Rigth
         <Description("Слева")> Left
     End Enum
-
+    
 End Namespace

@@ -13,7 +13,7 @@
     <AssemblyName>AutoCADElectrical</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -33,6 +33,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,30 +90,28 @@
   </PropertyGroup>
   <ItemGroup>
     <!--AutoCAD References-->
-    <Reference Include="AcCoreMgd">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\accoremgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcDbMgd">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\acdbmgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcePageManMgd">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\Acade\AcePageManMgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcMgd">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2018\acmgd.dll</HintPath>
-    </Reference>
     <!--Map 3D References-->
     <!--Civil 3D Refernces-->
     <!--ACA References Begin-->
     <!--ACA Refences End-->
     <!--AME Referebces Begin-->
     <!--AME Reference End-->
+    <Reference Include="accoremgd">
+      <HintPath>C:\Program Files\Autodesk\ApplicationPlugins\accoremgd.dll</HintPath>
+    </Reference>
+    <Reference Include="acdbmgd">
+      <HintPath>C:\Program Files\Autodesk\ApplicationPlugins\acdbmgd.dll</HintPath>
+    </Reference>
+    <Reference Include="AcePageManMgd, Version=1.0.6977.3331, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Autodesk\ApplicationPlugins\AcePageManMgd.dll</HintPath>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>C:\Program Files\Autodesk\ApplicationPlugins\acmgd.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoCADVBNETLayoutCreator">
+      <HintPath>..\..\AutoCADVBNETLayoutCreator\AutoCADVBNETLayoutCreator\bin\Debug\AutoCADVBNETLayoutCreator.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -143,6 +142,7 @@
     <Import Include="System.Linq.Expressions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\com\vasilchenko\ModifyTerminal\MoveTerminalDescription.vb" />
     <Compile Include="default_catDataSet.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -157,6 +157,8 @@
       <DependentUpon>footprint_lookupDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
+    <Compile Include="src\com\vasilchenko\ModifyTerminal\RedrawTerminalModule.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\JumperClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalStripClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalDictionaryClass.vb" />
@@ -168,11 +170,10 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalAccessoriesClass.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalClass.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalClasses\LevelTerminalClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\WireClass.vb" />
-    <Compile Include="src\com\vasilchenko\DBAccessConnection\DBConnection.vb" />
-    <Compile Include="src\com\vasilchenko\DBAccessConnection\DBDataAccessObject.vb" />
+    <Compile Include="src\com\vasilchenko\DBAccessConnection\DatabaseConnection.vb" />
+    <Compile Include="src\com\vasilchenko\DBAccessConnection\DataAccessObject.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\TerminalEnums.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\EnumDescriptor.vb" />
     <Compile Include="src\com\vasilchenko\TerminalEnums\EnumDescriptorCollection.vb" />
@@ -201,8 +202,9 @@
     </Compile>
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawLayerChecker.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawBlocks.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalModules\AddPhoenixTerminalAccessories.vb" />
-    <Compile Include="src\com\vasilchenko\TerminalModules\AddPhoenixJumpers.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddTerminalAccessories.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddJumpers.vb" />
+    <Compile Include="src\com\vasilchenko\ModifyTerminal\SwipeTerminalModule.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\TerminalClassMapping.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +276,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AutoCADElectricalSpecifications\AutoCADElectricalSpecifications\AutoCADElectricalSpecifications.vbproj">
+      <Project>{ea30a508-d0dc-4366-8ec4-5986665710b4}</Project>
+      <Name>AutoCADElectricalSpecifications</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
