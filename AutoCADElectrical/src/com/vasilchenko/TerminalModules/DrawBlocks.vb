@@ -4,7 +4,6 @@ Imports Autodesk.AutoCAD.DatabaseServices
 Imports Autodesk.AutoCAD.Geometry
 
 Namespace com.vasilchenko.TerminalModules
-
     Module DrawBlocks
         Public Sub DrawTerminalBlock(acDatabase As Database, acTransaction As Transaction,
                                      ByRef objInputLevelTerminal As TerminalClass, acInsertPt As Point3d, dblScale As Double, Optional dblRotation As Double = 0.0)
@@ -32,93 +31,97 @@ Namespace com.vasilchenko.TerminalModules
                 acBlockTableRecord.AppendEntity(acBlkRef)
                 acTransaction.AddNewlyCreatedDBObject(acBlkRef, True)
 
-                Dim acBlockTableAttrbRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
-                Dim acAttrbObjectId As ObjectId
+                Dim acBlockTableAttrRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
+                Dim acAttrObjectId As ObjectId
 
-                If objInputLevelTerminal.MainTermNumber = 31 Then
-                    Console.Write("")
-                End If
-
-                For Each acAttrbObjectId In acBlockTableAttrbRec
-                    Dim acAttrbEntity As Entity = acTransaction.GetObject(acAttrbObjectId, OpenMode.ForRead)
-                    Dim acAttrbDefinition As AttributeDefinition = TryCast(acAttrbEntity, AttributeDefinition)
-                    If (acAttrbDefinition IsNot Nothing) Then
-                        Dim acAttrbReference As New AttributeReference()
+                For Each acAttrObjectId In acBlockTableAttrRec
+                    Dim acAttrEntity As Entity = acTransaction.GetObject(acAttrObjectId, OpenMode.ForRead)
+                    Dim acAttrDefinition As AttributeDefinition = TryCast(acAttrEntity, AttributeDefinition)
+                    If (acAttrDefinition IsNot Nothing) Then
+                        Dim acAttrReference As New AttributeReference()
                         Dim strTermdesc As String = ""
-                        acAttrbReference.SetAttributeFromBlock(acAttrbDefinition, acBlkRef.BlockTransform)
-                        Select Case acAttrbReference.Tag
+                        acAttrReference.SetAttributeFromBlock(acAttrDefinition, acBlkRef.BlockTransform)
+                        Select Case acAttrReference.Tag
                             Case "WIDTH"
-                                objInputLevelTerminal.Width = CDbl(acAttrbReference.TextString)
+                                objInputLevelTerminal.Width = CDbl(acAttrReference.TextString)
                             Case "HEIGHT"
-                                objInputLevelTerminal.Height = CDbl(acAttrbReference.TextString)
+                                objInputLevelTerminal.Height = CDbl(acAttrReference.TextString)
                         End Select
                     End If
                 Next
 
-                For Each acAttrbObjectId In acBlockTableAttrbRec
-                    Dim acAttrbEntity As Entity = acTransaction.GetObject(acAttrbObjectId, OpenMode.ForRead)
-                    Dim acAttrbDefinition As AttributeDefinition = TryCast(acAttrbEntity, AttributeDefinition)
-                    If (acAttrbDefinition IsNot Nothing) Then
-                        Dim acAttrbReference As New AttributeReference()
+                For Each acAttrObjectId In acBlockTableAttrRec
+                    Dim acAttrEntity As Entity = acTransaction.GetObject(acAttrObjectId, OpenMode.ForRead)
+                    Dim acAttrDefinition = TryCast(acAttrEntity, AttributeDefinition)
+                    If (acAttrDefinition IsNot Nothing) Then
+                        Dim acAttrReference As New AttributeReference()
                         Dim strTermdesc As String = ""
-                        acAttrbReference.SetAttributeFromBlock(acAttrbDefinition, acBlkRef.BlockTransform)
-                        Select Case acAttrbReference.Tag
+                        acAttrReference.SetAttributeFromBlock(acAttrDefinition, acBlkRef.BlockTransform)
+                        Select Case acAttrReference.Tag
                             Case "P_TAGSTRIP"
-                                acAttrbReference.TextString = objInputLevelTerminal.TagStrip
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PTAG"
+                                acAttrReference.TextString = objInputLevelTerminal.TagStrip
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PTAG"
                             Case "INST"
-                                acAttrbReference.TextString = objInputLevelTerminal.Instance
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputLevelTerminal.Instance
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "LOC"
-                                acAttrbReference.TextString = objInputLevelTerminal.Location
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputLevelTerminal.Location
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "MFG"
-                                acAttrbReference.TextString = objInputLevelTerminal.Manufacture
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PMFG"
+                                acAttrReference.TextString = objInputLevelTerminal.Manufacture
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PMFG"
                             Case "CAT"
-                                acAttrbReference.TextString = objInputLevelTerminal.Catalog
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PCAT"
+                                acAttrReference.TextString = objInputLevelTerminal.Catalog
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PCAT"
                             Case "CNT"
-                                acAttrbReference.TextString = IIf(objInputLevelTerminal.Count = 0, 1.0, objInputLevelTerminal.Count)
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "0"
+                                acAttrReference.TextString = IIf(objInputLevelTerminal.Count = 0, 1.0, objInputLevelTerminal.Count)
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "0"
                             Case "TERM"
-                                acAttrbReference.TextString = objInputLevelTerminal.BottomLevelTerminal.TerminalNumber
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PTERM"
+                                acAttrReference.TextString = objInputLevelTerminal.BottomLevelTerminal.TerminalNumber
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PTERM"
                             Case "TERMT"
-                                acAttrbReference.TextString = objInputLevelTerminal.TopLevelTerminal.TerminalNumber
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PTERM"
+                                acAttrReference.TextString = objInputLevelTerminal.TopLevelTerminal.TerminalNumber
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PTERM"
                             Case "WIRENOL"
-                                If objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Count <> 0 AndAlso objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Item(0).WireNumber.ToLower <> "pe" Then
-                                    acAttrbReference.TextString = objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Item(0).WireNumber
+                                If _
+                                    objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Count <> 0 AndAlso
+                                    objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Item(0).WireNumber.ToLower <> "pe" Then
+                                    acAttrReference.TextString = objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Item(0).WireNumber
                                 End If
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PWIRE"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PWIRE"
                             Case "WIRENOR"
-                                If objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Count <> 0 AndAlso objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Item(0).WireNumber.ToLower <> "pe" Then
-                                    acAttrbReference.TextString = objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Item(0).WireNumber
+                                If _
+                                    objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Count <> 0 AndAlso
+                                    objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Item(0).WireNumber.ToLower <> "pe" Then
+                                    acAttrReference.TextString = objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Item(0).WireNumber
                                 End If
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PWIRE"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PWIRE"
                             Case "WIRENOTL"
-                                If objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Count <> 0 AndAlso objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Item(0).WireNumber.ToLower <> "pe" Then
-                                    acAttrbReference.TextString = objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Item(0).WireNumber
+                                If _
+                                    objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Count <> 0 AndAlso
+                                    objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Item(0).WireNumber.ToLower <> "pe" Then
+                                    acAttrReference.TextString = objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Item(0).WireNumber
                                 End If
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PWIRE"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PWIRE"
                             Case "WIRENOTR"
-                                If objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Count <> 0 AndAlso objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Item(0).WireNumber.ToLower <> "pe" Then
-                                    acAttrbReference.TextString = objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Item(0).WireNumber
+                                If _
+                                    objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Count <> 0 AndAlso
+                                    objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Item(0).WireNumber.ToLower <> "pe" Then
+                                    acAttrReference.TextString = objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Item(0).WireNumber
                                 End If
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PWIRE"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PWIRE"
                             Case "TERMDESCL"
                                 Dim isCable = False
                                 If objInputLevelTerminal.BottomLevelTerminal.WiresLeftListList.Count <> 0 Then
@@ -140,29 +143,34 @@ Namespace com.vasilchenko.TerminalModules
                                         End If
                                     End If
 
-                                    acAttrbReference.TextString = strTermdesc
+                                    acAttrReference.TextString = strTermdesc
 
                                     If objInputLevelTerminal.Catalog.StartsWith("UT ") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("ST ") OrElse
                                        objInputLevelTerminal.Catalog.StartsWith("UT 6-HESI") OrElse
                                        objInputLevelTerminal.Catalog.StartsWith("AVK") OrElse
-                                       objInputLevelTerminal.Catalog.StartsWith("WGO")Then
-                                        Dim x = acInsertPt.X - objInputLevelTerminal.Width / 2
-                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height / 2
-                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), -20, isCable)
-                                    ElseIf objInputLevelTerminal.Catalog.Equals("UTTB 2,5-MT-P/P") Then
+                                       objInputLevelTerminal.Catalog.StartsWith("WDU 2.5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("WPE 2.5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("WGO") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("280") Then
+                                        Dim x = acInsertPt.X - objInputLevelTerminal.Width/2
+                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height/2
+                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), - 20, isCable)
+                                    ElseIf objInputLevelTerminal.Catalog.StartsWith("UTTB 2,5") OrElse
+                                        objInputLevelTerminal.Catalog.StartsWith("STTB 2,5") Then
                                         Dim x = acInsertPt.X - 35
                                         Dim y = acInsertPt.Y - 6
-                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), -10, isCable)
+                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), - 10, isCable)
                                     ElseIf objInputLevelTerminal.Catalog.Equals("URTK 6") Then
-                                        Dim x = acInsertPt.X - objInputLevelTerminal.Width / 2
-                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height / 2
-                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), -26, isCable)
+                                        Dim x = acInsertPt.X - objInputLevelTerminal.Width/2
+                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height/2
+                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), - 26, isCable)
                                     End If
                                 End If
 
                                 strTermdesc = ""
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PDESC"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PDESC"
                             Case "TERMDESCR"
                                 Dim isCable = False
                                 If objInputLevelTerminal.BottomLevelTerminal.WiresRigthListList.Count <> 0 Then
@@ -181,27 +189,32 @@ Namespace com.vasilchenko.TerminalModules
                                         Next
                                         If strTermdesc <> "" Then strTermdesc = strTermdesc.Remove(strTermdesc.Length - 2)
                                     End If
-                                    acAttrbReference.TextString = strTermdesc
+                                    acAttrReference.TextString = strTermdesc
                                     If objInputLevelTerminal.Catalog.StartsWith("UT ") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("ST ") OrElse
                                        objInputLevelTerminal.Catalog.StartsWith("UT 6-HESI") OrElse
                                        objInputLevelTerminal.Catalog.StartsWith("AVK") OrElse
-                                       objInputLevelTerminal.Catalog.StartsWith("WGO")Then
-                                        Dim x = acInsertPt.X + objInputLevelTerminal.Width / 2
-                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height / 2
+                                       objInputLevelTerminal.Catalog.StartsWith("WDU 2.5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("WPE 2.5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("WGO") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("280") Then
+                                        Dim x = acInsertPt.X + objInputLevelTerminal.Width/2
+                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height/2
                                         DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), 20, isCable)
-                                    ElseIf objInputLevelTerminal.Catalog.Equals("UTTB 2,5-MT-P/P") Then
+                                    ElseIf objInputLevelTerminal.Catalog.StartsWith("UTTB 2,5") OrElse
+                                           objInputLevelTerminal.Catalog.StartsWith("STTB 2,5") Then
                                         Dim x = acInsertPt.X + 35
                                         Dim y = acInsertPt.Y - 6
                                         DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), 10, isCable)
                                     ElseIf objInputLevelTerminal.Catalog.Equals("URTK 6") Then
-                                        Dim x = acInsertPt.X + objInputLevelTerminal.Width / 2
-                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height / 2
+                                        Dim x = acInsertPt.X + objInputLevelTerminal.Width/2
+                                        Dim y = acInsertPt.Y - objInputLevelTerminal.Height/2
                                         DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), 26, isCable)
                                     End If
                                 End If
                                 strTermdesc = ""
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PDESC"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PDESC"
                             Case "TERMDESCTL"
                                 Dim isCable = False
                                 If objInputLevelTerminal.TopLevelTerminal.WiresLeftListList.Count <> 0 Then
@@ -220,16 +233,17 @@ Namespace com.vasilchenko.TerminalModules
                                         Next
                                         If strTermdesc <> "" Then strTermdesc = strTermdesc.Remove(strTermdesc.Length - 2)
                                     End If
-                                    acAttrbReference.TextString = strTermdesc
-                                    If objInputLevelTerminal.Catalog.Equals("UTTB 2,5-MT-P/P") Then
+                                    acAttrReference.TextString = strTermdesc
+                                    If objInputLevelTerminal.Catalog.StartsWith("UTTB 2,5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("STTB 2,5") Then
                                         Dim x = acInsertPt.X - 20
                                         Dim y = acInsertPt.Y - 3.5
-                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), -25, isCable)
+                                        DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), - 25, isCable)
                                     End If
                                 End If
                                 strTermdesc = ""
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PDESC"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PDESC"
                             Case "TERMDESCTR"
                                 Dim isCable = False
                                 If objInputLevelTerminal.TopLevelTerminal.WiresRigthListList.Count <> 0 Then
@@ -248,20 +262,21 @@ Namespace com.vasilchenko.TerminalModules
                                         Next
                                         If strTermdesc <> "" Then strTermdesc = strTermdesc.Remove(strTermdesc.Length - 2)
                                     End If
-                                    acAttrbReference.TextString = strTermdesc
-                                    If objInputLevelTerminal.Catalog.Equals("UTTB 2,5-MT-P/P") Then
+                                    acAttrReference.TextString = strTermdesc
+                                    If objInputLevelTerminal.Catalog.StartsWith("UTTB 2,5") OrElse
+                                       objInputLevelTerminal.Catalog.StartsWith("STTB 2,5") Then
                                         Dim x = acInsertPt.X + 10
                                         Dim y = acInsertPt.Y - 3.5
                                         DrawLine(acDatabase, acTransaction, New Point3d(x, y, 0), 35, isCable)
                                     End If
                                 End If
                                 strTermdesc = ""
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "PDESC"
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "PDESC"
                         End Select
 
-                        acBlkRef.AttributeCollection.AppendAttribute(acAttrbReference)
-                        acTransaction.AddNewlyCreatedDBObject(acAttrbReference, True)
+                        acBlkRef.AttributeCollection.AppendAttribute(acAttrReference)
+                        acTransaction.AddNewlyCreatedDBObject(acAttrReference, True)
 
                         'If dblRotation = 180 Then
                         '    Dim acPtFrom As Point3d = acInsertPt
@@ -276,7 +291,6 @@ Namespace com.vasilchenko.TerminalModules
             End Using
 
             'DrawLines(acDatabase, acTransaction, objInputLevelTerminal, acInsertPt, dblScale)
-
         End Sub
 
         Private Sub DrawLine(acDatabase As Database, acTransaction As Transaction, acInsertionPoint As Point3d, lenght As Integer, isCable As Boolean)
@@ -291,8 +305,8 @@ Namespace com.vasilchenko.TerminalModules
             End Using
         End Sub
 
-        Friend Sub DrawAccesoriesBlock(acDatabase As Database, acTransaction As Transaction,
-                                       ByRef objInputTerminal As TerminalClass, acInsertPt As Point3d, dblScale As Double)
+        Friend Sub DrawAccessorisesBlock(acDatabase As Database, acTransaction As Transaction,
+                                         ByRef objInputTerminal As TerminalClass, acInsertPt As Point3d, dblScale As Double)
 
             Dim strBlkName As String = SymbolUtilityServices.GetBlockNameFromInsertPathName(objInputTerminal.BlockPath)
             Dim acBlockTable As BlockTable = acTransaction.GetObject(acDatabase.BlockTableId, OpenMode.ForRead)
@@ -316,45 +330,45 @@ Namespace com.vasilchenko.TerminalModules
                 acBlockTableRecord.AppendEntity(acBlkRef)
                 acTransaction.AddNewlyCreatedDBObject(acBlkRef, True)
 
-                Dim acBlockTableAttrbRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
-                Dim acAttrbObjectId As ObjectId
-                For Each acAttrbObjectId In acBlockTableAttrbRec
-                    Dim acAttrbEntity As Entity = acTransaction.GetObject(acAttrbObjectId, OpenMode.ForRead)
-                    Dim acAttrbDefinition As AttributeDefinition = TryCast(acAttrbEntity, AttributeDefinition)
-                    If (acAttrbDefinition IsNot Nothing) Then
-                        Dim acAttrbReference As New AttributeReference()
-                        acAttrbReference.SetAttributeFromBlock(acAttrbDefinition, acBlkRef.BlockTransform)
-                        Select Case acAttrbReference.Tag
+                Dim acBlockTableAttrRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
+                Dim acAttrObjectId As ObjectId
+                For Each acAttrObjectId In acBlockTableAttrRec
+                    Dim acAttrEntity As Entity = acTransaction.GetObject(acAttrObjectId, OpenMode.ForRead)
+                    Dim acAttrDefinition = TryCast(acAttrEntity, AttributeDefinition)
+                    If (acAttrDefinition IsNot Nothing) Then
+                        Dim acAttrReference As New AttributeReference()
+                        acAttrReference.SetAttributeFromBlock(acAttrDefinition, acBlkRef.BlockTransform)
+                        Select Case acAttrReference.Tag
                             Case "P_TAGSTRIP"
-                                acAttrbReference.TextString = objInputTerminal.TagStrip
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PTAG"
+                                acAttrReference.TextString = objInputTerminal.TagStrip
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PTAG"
                             Case "INST"
-                                acAttrbReference.TextString = objInputTerminal.Instance
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputTerminal.Instance
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "LOC"
-                                acAttrbReference.TextString = objInputTerminal.Location
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputTerminal.Location
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "CNT"
-                                acAttrbReference.TextString = IIf(objInputTerminal.Count = 0, 1.0, objInputTerminal.Count)
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "0"
+                                acAttrReference.TextString = IIf(objInputTerminal.Count = 0, 1.0, objInputTerminal.Count)
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "0"
                             Case "MFG"
-                                acAttrbReference.TextString = objInputTerminal.Manufacture
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PMFG"
+                                acAttrReference.TextString = objInputTerminal.Manufacture
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PMFG"
                             Case "CAT"
-                                acAttrbReference.TextString = objInputTerminal.Catalog
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PCAT"
+                                acAttrReference.TextString = objInputTerminal.Catalog
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PCAT"
                             Case "HEIGHT"
-                                objInputTerminal.Height = CDbl(acAttrbReference.TextString)
+                                objInputTerminal.Height = CDbl(acAttrReference.TextString)
                         End Select
 
-                        acBlkRef.AttributeCollection.AppendAttribute(acAttrbReference)
-                        acTransaction.AddNewlyCreatedDBObject(acAttrbReference, True)
+                        acBlkRef.AttributeCollection.AppendAttribute(acAttrReference)
+                        acTransaction.AddNewlyCreatedDBObject(acAttrReference, True)
                     End If
                 Next
             End Using
@@ -385,49 +399,48 @@ Namespace com.vasilchenko.TerminalModules
                 acBlockTableRecord.AppendEntity(acBlkRef)
                 acTransaction.AddNewlyCreatedDBObject(acBlkRef, True)
 
-                Dim acBlockTableAttrbRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
-                Dim acAttrbObjectId As ObjectId
-                For Each acAttrbObjectId In acBlockTableAttrbRec
-                    Dim acAttrbEntity As Entity = acTransaction.GetObject(acAttrbObjectId, OpenMode.ForRead)
-                    Dim acAttrbDefinition As AttributeDefinition = TryCast(acAttrbEntity, AttributeDefinition)
-                    If (acAttrbDefinition IsNot Nothing) Then
-                        Dim acAttrbReference As New AttributeReference()
-                        acAttrbReference.SetAttributeFromBlock(acAttrbDefinition, acBlkRef.BlockTransform)
-                        Select Case acAttrbReference.Tag
+                Dim acBlockTableAttrRec As BlockTableRecord = acTransaction.GetObject(acInsObjectId, OpenMode.ForRead)
+                Dim acAttrObjectId As ObjectId
+                For Each acAttrObjectId In acBlockTableAttrRec
+                    Dim acAttrEntity As Entity = acTransaction.GetObject(acAttrObjectId, OpenMode.ForRead)
+                    Dim acAttrDefinition = TryCast(acAttrEntity, AttributeDefinition)
+                    If (acAttrDefinition IsNot Nothing) Then
+                        Dim acAttrReference As New AttributeReference()
+                        acAttrReference.SetAttributeFromBlock(acAttrDefinition, acBlkRef.BlockTransform)
+                        Select Case acAttrReference.Tag
                             Case "P_TAGSTRIP"
-                                acAttrbReference.TextString = objInputJumper.Jumper.TagStrip
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PTAG"
+                                acAttrReference.TextString = objInputJumper.Jumper.TagStrip
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PTAG"
                             Case "INST"
-                                acAttrbReference.TextString = objInputJumper.Jumper.Instance
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputJumper.Jumper.Instance
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "LOC"
-                                acAttrbReference.TextString = objInputJumper.Jumper.Location
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PLOC"
+                                acAttrReference.TextString = objInputJumper.Jumper.Location
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PLOC"
                             Case "MFG"
-                                acAttrbReference.TextString = objInputJumper.Jumper.Manufacture
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PMFG"
+                                acAttrReference.TextString = objInputJumper.Jumper.Manufacture
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PMFG"
                             Case "CNT"
-                                acAttrbReference.TextString = IIf(objInputJumper.Jumper.Count = 0, 1.0, objInputJumper.Jumper.Count)
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
-                                acAttrbReference.Layer = "0"
+                                acAttrReference.TextString = IIf(objInputJumper.Jumper.Count = 0, 1.0, objInputJumper.Jumper.Count)
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD")
+                                acAttrReference.Layer = "0"
                             Case "CAT"
-                                acAttrbReference.TextString = objInputJumper.Jumper.Catalog
-                                acAttrbReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
-                                acAttrbReference.Layer = "PCAT"
+                                acAttrReference.TextString = objInputJumper.Jumper.Catalog
+                                acAttrReference.TextStyleId = CType(acTransaction.GetObject(acDatabase.TextStyleTableId, OpenMode.ForRead), TextStyleTable)("WD_IEC")
+                                acAttrReference.Layer = "PCAT"
                             Case "HEIGHT"
-                                objInputJumper.Jumper.Height = CDbl(acAttrbReference.TextString)
+                                objInputJumper.Jumper.Height = CDbl(acAttrReference.TextString)
                         End Select
 
-                        acBlkRef.AttributeCollection.AppendAttribute(acAttrbReference)
-                        acTransaction.AddNewlyCreatedDBObject(acAttrbReference, True)
+                        acBlkRef.AttributeCollection.AppendAttribute(acAttrReference)
+                        acTransaction.AddNewlyCreatedDBObject(acAttrReference, True)
                     End If
                 Next
             End Using
         End Sub
-
     End Module
 End Namespace

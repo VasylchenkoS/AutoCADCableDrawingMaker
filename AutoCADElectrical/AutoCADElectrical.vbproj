@@ -158,6 +158,13 @@
     </Compile>
     <Compile Include="src\com\vasilchenko\DBAccessConnection\WiresAdditionalFunctions.vb" />
     <Compile Include="src\com\vasilchenko\ModifyTerminal\RedrawTerminalModule.vb" />
+    <Compile Include="src\com\vasilchenko\TerminalForms\ufTagChanger.Designer.vb">
+      <DependentUpon>ufTagChanger.vb</DependentUpon>
+    </Compile>
+    <Compile Include="src\com\vasilchenko\TerminalForms\ufTagChanger.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\com\vasilchenko\TerminalModules\TagChangerModule.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\JumperClass.vb" />
     <Compile Include="src\com\vasilchenko\TerminalClasses\TerminalStripClass.vb" />
@@ -200,6 +207,7 @@
     <Compile Include="src\com\vasilchenko\TerminalForms\ufTerminalTypeSelector.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="src\com\vasilchenko\TerminalModules\AddressMarkingModule.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawLayerChecker.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\DrawBlocks.vb" />
     <Compile Include="src\com\vasilchenko\TerminalModules\AddTerminalAccessories.vb" />
@@ -208,6 +216,9 @@
     <Compile Include="src\com\vasilchenko\TerminalModules\TerminalClassMapping.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="src\com\vasilchenko\TerminalForms\ufTagChanger.resx">
+      <DependentUpon>ufTagChanger.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\com\vasilchenko\TerminalForms\ufTerminalSelector.resx">
       <DependentUpon>ufTerminalSelector.vb</DependentUpon>
     </EmbeddedResource>

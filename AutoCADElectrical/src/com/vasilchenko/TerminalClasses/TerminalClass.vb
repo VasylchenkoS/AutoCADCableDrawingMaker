@@ -13,6 +13,7 @@
         Public Property Width As Double
         Public Property Height As Double
         Public Property Count As Double
+        Public Property LinkTerm As String
 
 
         Public Sub New()

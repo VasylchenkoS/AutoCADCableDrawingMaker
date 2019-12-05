@@ -25,14 +25,14 @@ Namespace com.vasilchenko.TerminalEnums
             Next
             Return Nothing
         End Function
-        Public Function Convert(eAccEnum As TerminaAccessoriesEnum, objCurLevelTerminal As TerminalClass) As TerminalClass
+        Public Function Convert(eAccEnum As TerminalAccessoriesEnum, objCurLevelTerminal As TerminalClass) As TerminalClass
             Dim objTerminalAcc As New TerminalClass
 
             objTerminalAcc.TagStrip = objCurLevelTerminal.TagStrip
-            objTerminalAcc.Instance = "162.КЛЕММЫ-ПРОЧЕЕ"
+            objTerminalAcc.Instance = "62.КЛЕММЫ-ПРОЧЕЕ"
             objTerminalAcc.Location = objCurLevelTerminal.Location
             objTerminalAcc.Manufacture = objCurLevelTerminal.Manufacture 
-            objTerminalAcc.Catalog = New EnumDescriptor(Of TerminaAccessoriesEnum)(eAccEnum).ToString
+            objTerminalAcc.Catalog = New EnumDescriptor(Of TerminalAccessoriesEnum)(eAccEnum).ToString
             DataAccessObject.FillSingleTerminalBlockPath(objTerminalAcc)
             Return objTerminalAcc
         End Function

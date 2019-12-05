@@ -42,8 +42,6 @@ Namespace com.vasilchenko.TerminalModules
                                     acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 7)
                                 Case "PTAG"
                                     acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 51)
-                                Case "PTERM"
-                                    acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 6)
                                 Case "PWIRE"
                                     acLayerTblRec.Color = Color.FromColorIndex(ColorMethod.ByAci, 6)
                                 Case "PTERM"
@@ -74,7 +72,7 @@ Namespace com.vasilchenko.TerminalModules
                             Case "LINK"
                                 acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 11)
                             Case "JUMPER"
-                                acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 3)
+                                acCurLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 250)
                                 acCurLayer.LineWeight = LineWeight.LineWeight005
                         End Select
                     End If

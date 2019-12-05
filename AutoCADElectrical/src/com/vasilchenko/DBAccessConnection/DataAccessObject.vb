@@ -8,7 +8,7 @@ Namespace com.vasilchenko.DBAccessConnection
     Module DataAccessObject
         'Private Const strConstFootprintPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\footprint_lookup.mdb"
         'Private Const strConstDefaultCatPath As String = "D:\Autocad Additional Files\MyDatabase\Sources\ru-RU\Catalogs\default_cat.mdb"
-        Private Const PANEL_GRAPHICS_PATH As String = "D:\Autocad Additional Files\MyDatabase\User Graphics\Panel\2D_Graphics\"
+        Private Const PanelGraphicsPath As String = "D:\Autocad Additional Files\MyDatabase\User Graphics\Panel\2D_Graphics\"
 
         Public Function GetAllLocations() As ArrayList
             Dim objDataTable As DataTable
@@ -81,7 +81,7 @@ Namespace com.vasilchenko.DBAccessConnection
 
             Return objLocationList
         End Function
-        Public Function FillTermTypeData(strTagstrip As String, shtTermNumber As Short, strLocation As string) As TerminalClass
+        Public Function FillTermTypeData(strTagstrip As String, shtTermNumber As Short, strLocation As String) As TerminalClass
             Dim objDataTable As DataTable
             Dim sqlQuery As String
             Dim objDoubleTerminal As New TerminalClass
@@ -89,10 +89,10 @@ Namespace com.vasilchenko.DBAccessConnection
             Dim strConstProjectDatabasePath As String = ProjectManager.GetInstance().GetActiveProject().GetDbFullPath()
 
             objDoubleTerminal.TagStrip = strTagstrip
-            objDoubleTerminal.Location = strLocation 
+            objDoubleTerminal.Location = strLocation
             objTerminal.TerminalNumber = shtTermNumber
 
-            sqlQuery = "SELECT [INST], [LOC], [MFG], [CAT], [HDL], [STRIPSEQ], [LNUMBER], [LTOTAL], [CNT] " &
+            sqlQuery = "SELECT [INST], [LOC], [MFG], [CAT], [HDL], [STRIPSEQ], [LNUMBER], [LTOTAL], [CNT], [LINKTERM] " &
                     "FROM TERMS " &
                     "WHERE [TAGSTRIP] = '" & strTagstrip & "' AND [TERM] = '" & shtTermNumber & "' AND [LOC] = '" & strLocation & "' AND [MFG] IS NOT NULL AND [JUMPER_ID] IS NULL"
 
@@ -111,7 +111,7 @@ Namespace com.vasilchenko.DBAccessConnection
                         Else
                             objDoubleTerminal.Count = 1
                         End If
-                        If Not IsDBNull(.item("STRIPSEQ")) And (Not IsDBNull(.item("LTOTAL")) AndAlso .item("LTOTAL") <> "1") Then
+                        If Not IsDBNull(.item("STRIPSEQ")) AndAlso (Not IsDBNull(.item("LTOTAL")) AndAlso .item("LTOTAL") <> "1") Then
                             objDoubleTerminal.MainTermNumber = .item("STRIPSEQ")
                         Else
                             objDoubleTerminal.MainTermNumber = shtTermNumber
@@ -125,7 +125,8 @@ Namespace com.vasilchenko.DBAccessConnection
                             End If
                         Else
                             objDoubleTerminal.BottomLevelTerminal = objTerminal
-                        End If
+                        End If                        
+                        If Not IsDBNull(.item("LINKTERM")) Then objDoubleTerminal.LinkTerm = .item("LINKTERM")
                     End With
                 Next objRow
             End If
@@ -139,16 +140,16 @@ Namespace com.vasilchenko.DBAccessConnection
         End Sub
         Public Sub FillSingleTerminalBlockPath(ByRef objInputTerminal As TerminalClass)
             Dim objDataTable As DataTable
-            Dim sqlQuery As String
+            Dim sqlQuery As String = ""
             Try
                 sqlQuery = "SELECT [BLKNAM] " &
                         "FROM [" & objInputTerminal.Manufacture & "] " &
                         "WHERE [CATALOG] = '" & objInputTerminal.Catalog & "'"
                 objDataTable = DatabaseConnection.GetSqlDataTable(sqlQuery, My.Settings.footprint_lookupSQLConnectionString)
-                If Not IsNothing(objDataTable) Then objInputTerminal.BlockPath = PANEL_GRAPHICS_PATH & objDataTable.Rows(0).Item("BLKNAM")
+                If Not IsNothing(objDataTable) Then objInputTerminal.BlockPath = PanelGraphicsPath & objDataTable.Rows(0).Item("BLKNAM")
             Catch ex As Exception
-                MsgBox ("Объект не найден в графической базе. Запрос: " & sqlQuery )
-            end try
+                MsgBox("Объект не найден в графической базе. Запрос: " & sqlQuery)
+            End Try
         End Sub
         Public Sub FillTerminalConnectionsData(ByRef objInputList As List(Of TerminalClass), eDucktSide As SideEnum)
             For Each objInputTerminal As TerminalClass In objInputList
@@ -175,20 +176,12 @@ Namespace com.vasilchenko.DBAccessConnection
 
             If Not IsNothing(objDataTable) Then
                 Dim strWireno As String = ""
-
                 For Each objRow In objDataTable.Rows
 
                     Dim objWire As New WireClass
                     Dim objCable As New CableClass
                     Dim objWiresList As New List(Of WireClass)
-
-                    'For shtI As Short = 0 To 8
-                    '    If IsDBNull(objRow.ItemArray(shtI)) Then
-                    '        MsgBox("Не указано значение " & objRow.Table.Columns(shtI).ToString & " для клеммы " & objInputTerminal.P_TAGSTRIP & ":" & objInputTerminal.TERM & ". Исправте и перезапустите программу", MsgBoxStyle.Critical, "Error")
-                    '        Throw New ArgumentNullException
-                    '    End If
-                    'Next
-
+                    
                     With objRow
                         If .Item("NAMHDL1").Equals(objInputLevelTerminal.Handle) Then
                             objWire.Instance = .Item("INST2").ToString
@@ -208,7 +201,7 @@ Namespace com.vasilchenko.DBAccessConnection
                             strWireno = .Item("WIRENO")
                             objWire.WireNumber = strWireno
                         Else
-                            MsgBox("Для вывода " & objWire.ConnTag & ":" & objWire.ConnPin & " не назначено номера провода")
+                            Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("Для вывода " & objWire.ConnTag & ":" & objWire.ConnPin & " не назначено номера провода" & vbCrLf)
                             Exit Sub
                         End If
 
@@ -265,7 +258,7 @@ Namespace com.vasilchenko.DBAccessConnection
                         objB = objTempList.Find(Function(x) x.WireNumber.StartsWith("M"))
                     End If
 
-                    'If eDucktSide.Equals(SideEnum.Rigth) Then
+                    'If eDucktSide.Equals(SideEnum.Right) Then
                     If intCableNum <> -1 Then
                         objInputLevelTerminal.AddWireLeft = objTempList.Item(intCableNum)
                         objTempList.RemoveAt(intCableNum)
@@ -288,43 +281,10 @@ Namespace com.vasilchenko.DBAccessConnection
                             End If
                         Next
                     End If
-                    ''Else
-                    'If intCableNum <> -1 Then
-                    '    objInputTerminal.AddWireRigth = objTempList.Item(intCableNum)
-                    '    objTempList.RemoveAt(intCableNum)
-                    '    objInputTerminal.WiresLeftList = (From l In objTempList
-                    '                                      Select l).ToList
-                    'Else
-                    '    If objA IsNot Nothing Then
-                    '        objInputTerminal.WiresRigthList = objA
-                    '        objTempList.RemoveAll(Function(x) x.Wireno.StartsWith("D"))
-                    '    ElseIf objB IsNot Nothing Then
-                    '        objInputTerminal.AddWireLeft = objB
-                    '        objTempList.Remove(objB)
-                    '    End If
-
-                    '    For i As Short = 0 To objTempList.Count - 1
-                    '        If (i + 1) Mod 2 = 0 Then
-                    '            objInputTerminal.AddWireRigth = objTempList.Item(i)
-                    '        Else
-                    '            objInputTerminal.AddWireLeft = objTempList.Item(i)
-                    '        End If
-                    '    Next
-                    'End If
-                    'End If
                 ElseIf objWiresDictionary.Count = 2 Then
-
                     Dim objTempListA As List(Of WireClass) = objWiresDictionary.Item(0)
                     Dim objTempListB As List(Of WireClass) = objWiresDictionary.Item(1)
-
-                    'If eDucktSide.Equals(SideEnum.Rigth) Then
-                    'objTempListA = objWiresDictionary.Item(0)
-                    'objTempListB = objWiresDictionary.Item(1)
-                    'Else
-                    '    objTempListA = objWiresDictionary.Item(1)
-                    '    objTempListB = objWiresDictionary.Item(0)
-                    'End If
-
+                    
                     If WiresAdditionalFunctions.CableInList(objTempListA) <> -1 Then
                         objInputLevelTerminal.WiresLeftListList = objTempListA
                         objInputLevelTerminal.WiresRigthListList = objTempListB
@@ -359,7 +319,7 @@ Namespace com.vasilchenko.DBAccessConnection
                             "FROM " &
                             "(SELECT Min(CInt([TERM])) AS V1, FIRST([CAT]) AS V3, FIRST([MFG]) AS V4 , FIRST([INST]) AS V5 , FIRST([LOC]) AS V6 , FIRST([CNT]) AS V7 " &
                             "FROM TERMS " &
-                            "WHERE [TAGSTRIP]='" & strTagstrip & "' AND [JUMPER_ID] <> '' " &
+                            "WHERE [TAGSTRIP]='" & strTagstrip & "' AND [JUMPER_ID] <> '' AND [MFG] <> '' " &
                             "GROUP BY [JUMPER_ID]) AS T1"
 
             objDataTable = DatabaseConnection.GetOleDataTable(sqlQuery, strConstProjectDatabasePath)
@@ -370,7 +330,7 @@ Namespace com.vasilchenko.DBAccessConnection
                     objAccJumper = New TerminalClass
                     With objRow
                         objAccJumper.TagStrip = strTagstrip
-                        objAccJumper.Instance = "163.КЛЕММЫ-ПЕРЕМЫЧКИ"
+                        objAccJumper.Instance = "63.КЛЕММЫ-ПЕРЕМЫЧКИ"
                         objAccJumper.Location = .item("LOC")
                         objAccJumper.Manufacture = .item("MFG")
                         objAccJumper.Catalog = .item("CAT")
@@ -384,11 +344,11 @@ Namespace com.vasilchenko.DBAccessConnection
                     End With
                     If objResultJumper IsNot Nothing Then
                         DataAccessObject.FillSingleTerminalBlockPath(objResultJumper.Jumper)
-                        If objAccJumper.Manufacture.ToLower.Equals("phoenix contact") then
+                        If objAccJumper.Manufacture.ToLower.Equals("phoenix contact") Then
                             objResultJumper.TermCount = CInt(Replace(Mid(objResultJumper.Jumper.Catalog, 5, 2), "-", ""))
-                        Else if objAccJumper.Manufacture.ToLower.Equals("klemsan") then
-                            objResultJumper.TermCount = CInt(Mid(objResultJumper.Jumper.Catalog, InStr(objResultJumper.Jumper.Catalog,"/")+1, 2))
-                        end if 
+                        ElseIf objAccJumper.Manufacture.ToLower.Equals("klemsan") Then
+                            objResultJumper.TermCount = CInt(Mid(objResultJumper.Jumper.Catalog, InStr(objResultJumper.Jumper.Catalog, "/") + 1, 2))
+                        End If
                         objJumperList.Add(objResultJumper)
                     End If
                 Next objRow
@@ -397,5 +357,23 @@ Namespace com.vasilchenko.DBAccessConnection
             Return objJumperList
         End Function
 
+        Public Function GetMarkingList() As List(Of String)
+            Dim markingList As New List(Of String)
+
+            Const sqlQuery As String = "SELECT [WIRENO] " &
+                                       "FROM [WNETLST] " &
+                                       "WHERE [WIRENO] IS NOT NULL AND [WIRENO] <> 'PE' " &
+                                       "ORDER BY [WIRENO]"
+
+            Dim objDataTable As Data.DataTable = DatabaseConnection.GetOleDataTable(sqlQuery, ProjectManager.GetInstance().GetActiveProject().GetDbFullPath())
+
+            If Not IsNothing(objDataTable) Then
+                For Each objRow In objDataTable.Rows
+                    markingList.Add(objRow.Item("WIRENO"))
+                Next objRow
+            End If
+
+            Return markingList
+        End Function
     End Module
 End Namespace

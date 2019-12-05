@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
+Imports AutoCADElectrical.com.vasilchenko.TerminalModules
 Imports Autodesk.AutoCAD.Runtime
 Imports Autodesk.AutoCAD.ApplicationServices
-Imports AutoCADElectricalSpecifications.com.vasilchenko.Commands
 Imports AutoCADElectricalSpecifications.com.vasilchenko.Forms
 Imports AutoCADElectricalSpecifications.com.vasilchenko.Modules
 Imports AutoCADVBNETLayoutCreator
@@ -11,6 +11,10 @@ Imports Autodesk.AutoCAD.EditorInput
 
 Namespace com.vasilchenko
     Public Class Commands
+
+        <DllImport("accore.dll", CallingConvention:=CallingConvention.Cdecl, EntryPoint:="acedTrans")>
+        Public Shared Function acedTrans(ByVal point As Double(), ByVal fromRb As IntPtr, ByVal toRb As IntPtr, ByVal disp As Integer, ByVal result As Double()) As Integer
+        End Function
 
         <CommandMethod("ASU_Terminal_Builder", CommandFlags.Session)>
         Public Shared Sub Builder()
@@ -48,6 +52,9 @@ Namespace com.vasilchenko
 
         <CommandMethod("ASU_Terminal_Redraw", CommandFlags.Session)>
         Public Shared Sub StartCheck()
+            
+            Application.AcadApplication.ActiveDocument.SendCommand("AEREBUILDDB" & vbCr)
+
             Using docLock As DocumentLock = Application.DocumentManager.MdiActiveDocument.LockDocument()
                 Dim objForm = New ufTerminalSelector
                 Try
@@ -71,13 +78,12 @@ Namespace com.vasilchenko
         End Sub
 
         <CommandMethod("ASU_Specification", CommandFlags.Session)>
-        Public Shared Sub SpecificationKd()
+        Public Shared Sub Specification()
 
             Dim acDocument As Document = Application.DocumentManager.MdiActiveDocument
             Dim acDatabase As Database = acDocument.Database
             Dim acEditor As Editor = acDocument.Editor
 
-            'Application.AcadApplication.ActiveDocument.SendCommand("(command ""_-Purge"")(command ""_ALL"")(command ""*"")(command ""_N"")" & vbCr)
             Application.AcadApplication.ActiveDocument.SendCommand("AEREBUILDDB" & vbCr)
 
             Using docLock As DocumentLock = Application.DocumentManager.MdiActiveDocument.LockDocument()
@@ -87,7 +93,7 @@ Namespace com.vasilchenko
                     uf.ShowDialog()
                     If uf.rbProjUpdate.Checked = True Then
                     ElseIf uf.rbProjCreate.Checked = True Then
-                        ProjectTableDrawing.ProjectTable(acDocument, acDatabase, acTransaction, acEditor)
+                        ProjectTableDrawing.ProjectTable(acDatabase, acTransaction, acEditor)
                         acEditor.WriteMessage("Таблица успешно создана")
                     ElseIf uf.rbSheetCreate.Checked = True Then
                         KDTableDrawing.DrawSheetTable(acDatabase, acTransaction, acEditor)
@@ -116,11 +122,6 @@ Namespace com.vasilchenko
 
         End Sub
 
-        <DllImport("accore.dll", CallingConvention:=CallingConvention.Cdecl, EntryPoint:="acedTrans")>
-        Public Shared Function acedTrans(ByVal point As Double(), ByVal fromRb As IntPtr, ByVal toRb As IntPtr, ByVal disp As Integer, ByVal result As Double()) As Integer
-
-        End Function
-
         <CommandMethod("ASU_LayoutCreator", CommandFlags.Session)>
         Public Shared Sub Main()
             Dim swTimer = New Stopwatch
@@ -143,6 +144,49 @@ Namespace com.vasilchenko
                 Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("---------------------------------------------")
                 ufStart.Dispose()
             End Try
+        End Sub
+
+        <CommandMethod("ASU_CableJournal_RZA", CommandFlags.Session)>
+        Public Shared Sub CableJournal()
+
+            Dim acDocument As Document = Application.DocumentManager.MdiActiveDocument
+            Dim acDatabase As Database = acDocument.Database
+            Dim acEditor As Editor = acDocument.Editor
+
+            'Application.AcadApplication.ActiveDocument.SendCommand("(command ""_-Purge"")(command ""_ALL"")(command ""*"")(command ""_N"")" & vbCr)
+            Application.AcadApplication.ActiveDocument.SendCommand("AEREBUILDDB" & vbCr)
+
+            Using docLock As DocumentLock = Application.DocumentManager.MdiActiveDocument.LockDocument()
+                Dim acTransaction As Transaction = acDatabase.TransactionManager.StartTransaction()
+                Try
+                    CableTableDrawing.CableTable(acDocument, acDatabase, acTransaction, acEditor)
+                    acTransaction.Commit()
+                Catch ex As Exception
+                    MsgBox("ERROR:[" & ex.Message & "]" & vbCr & "TargetSite: " & ex.TargetSite.ToString & vbCr & "StackTrace: " & ex.StackTrace, vbCritical, "ERROR!")
+                    acTransaction.Abort()
+                Finally
+                    acTransaction.Dispose()
+                End Try
+            End Using
+
+        End Sub
+
+        <CommandMethod("ASU_Marking_Maker", CommandFlags.Session)>
+        Public Shared Sub AddressMarking()
+            AddressMarkingModule.CreateFileWithAddressMarking()
+        End Sub
+
+        <CommandMethod("ASU_TAG_CHANGE", CommandFlags.Session)>
+        Public Shared Sub TagChanger()
+
+            Using docLock As DocumentLock = Application.DocumentManager.MdiActiveDocument.LockDocument()
+                Try
+                    TagChangerModule.ChangeTag()
+                Catch ex As Exception
+                    MsgBox("ERROR:[" & ex.Message & "]" & vbCr & "TargetSite: " & ex.TargetSite.ToString & vbCr & "StackTrace: " & ex.StackTrace, vbCritical, "ERROR!")
+                End Try
+            End Using
+
         End Sub
 
     End Class
